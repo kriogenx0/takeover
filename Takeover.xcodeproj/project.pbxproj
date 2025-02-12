@@ -1,0 +1,548 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		AB6E98752D5D3CE600C351F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB6E98592D5D3CE400C351F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB6E98602D5D3CE400C351F6;
+			remoteInfo = Takeover;
+		};
+		AB6E987F2D5D3CE600C351F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB6E98592D5D3CE400C351F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB6E98602D5D3CE400C351F6;
+			remoteInfo = Takeover;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AB6E98612D5D3CE400C351F6 /* Takeover.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Takeover.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB6E98742D5D3CE600C351F6 /* TakeoverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TakeoverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TakeoverUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AB6E98632D5D3CE400C351F6 /* Takeover */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Takeover;
+			sourceTree = "<group>";
+		};
+		AB6E98772D5D3CE600C351F6 /* TakeoverTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TakeoverTests;
+			sourceTree = "<group>";
+		};
+		AB6E98812D5D3CE600C351F6 /* TakeoverUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TakeoverUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AB6E985E2D5D3CE400C351F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E98712D5D3CE600C351F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E987B2D5D3CE600C351F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AB6E98582D5D3CE400C351F6 = {
+			isa = PBXGroup;
+			children = (
+				AB6E98632D5D3CE400C351F6 /* Takeover */,
+				AB6E98772D5D3CE600C351F6 /* TakeoverTests */,
+				AB6E98812D5D3CE600C351F6 /* TakeoverUITests */,
+				AB6E98622D5D3CE400C351F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AB6E98622D5D3CE400C351F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AB6E98612D5D3CE400C351F6 /* Takeover.app */,
+				AB6E98742D5D3CE600C351F6 /* TakeoverTests.xctest */,
+				AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AB6E98602D5D3CE400C351F6 /* Takeover */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB6E98882D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "Takeover" */;
+			buildPhases = (
+				AB6E985D2D5D3CE400C351F6 /* Sources */,
+				AB6E985E2D5D3CE400C351F6 /* Frameworks */,
+				AB6E985F2D5D3CE400C351F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AB6E98632D5D3CE400C351F6 /* Takeover */,
+			);
+			name = Takeover;
+			packageProductDependencies = (
+			);
+			productName = Takeover;
+			productReference = AB6E98612D5D3CE400C351F6 /* Takeover.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AB6E98732D5D3CE600C351F6 /* TakeoverTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB6E988B2D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "TakeoverTests" */;
+			buildPhases = (
+				AB6E98702D5D3CE600C351F6 /* Sources */,
+				AB6E98712D5D3CE600C351F6 /* Frameworks */,
+				AB6E98722D5D3CE600C351F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB6E98762D5D3CE600C351F6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AB6E98772D5D3CE600C351F6 /* TakeoverTests */,
+			);
+			name = TakeoverTests;
+			packageProductDependencies = (
+			);
+			productName = TakeoverTests;
+			productReference = AB6E98742D5D3CE600C351F6 /* TakeoverTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AB6E987D2D5D3CE600C351F6 /* TakeoverUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB6E988E2D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "TakeoverUITests" */;
+			buildPhases = (
+				AB6E987A2D5D3CE600C351F6 /* Sources */,
+				AB6E987B2D5D3CE600C351F6 /* Frameworks */,
+				AB6E987C2D5D3CE600C351F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB6E98802D5D3CE600C351F6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AB6E98812D5D3CE600C351F6 /* TakeoverUITests */,
+			);
+			name = TakeoverUITests;
+			packageProductDependencies = (
+			);
+			productName = TakeoverUITests;
+			productReference = AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AB6E98592D5D3CE400C351F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					AB6E98602D5D3CE400C351F6 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					AB6E98732D5D3CE600C351F6 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AB6E98602D5D3CE400C351F6;
+					};
+					AB6E987D2D5D3CE600C351F6 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AB6E98602D5D3CE400C351F6;
+					};
+				};
+			};
+			buildConfigurationList = AB6E985C2D5D3CE400C351F6 /* Build configuration list for PBXProject "Takeover" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AB6E98582D5D3CE400C351F6;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AB6E98622D5D3CE400C351F6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AB6E98602D5D3CE400C351F6 /* Takeover */,
+				AB6E98732D5D3CE600C351F6 /* TakeoverTests */,
+				AB6E987D2D5D3CE600C351F6 /* TakeoverUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AB6E985F2D5D3CE400C351F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E98722D5D3CE600C351F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E987C2D5D3CE600C351F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AB6E985D2D5D3CE400C351F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E98702D5D3CE600C351F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB6E987A2D5D3CE600C351F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AB6E98762D5D3CE600C351F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB6E98602D5D3CE400C351F6 /* Takeover */;
+			targetProxy = AB6E98752D5D3CE600C351F6 /* PBXContainerItemProxy */;
+		};
+		AB6E98802D5D3CE600C351F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB6E98602D5D3CE400C351F6 /* Takeover */;
+			targetProxy = AB6E987F2D5D3CE600C351F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AB6E98862D5D3CE600C351F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AB6E98872D5D3CE600C351F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		AB6E98892D5D3CE600C351F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Takeover/Takeover.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Takeover/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.Takeover;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AB6E988A2D5D3CE600C351F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Takeover/Takeover.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Takeover/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.Takeover;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AB6E988C2D5D3CE600C351F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.TakeoverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Takeover.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Takeover";
+			};
+			name = Debug;
+		};
+		AB6E988D2D5D3CE600C351F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.TakeoverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Takeover.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Takeover";
+			};
+			name = Release;
+		};
+		AB6E988F2D5D3CE600C351F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.TakeoverUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Takeover;
+			};
+			name = Debug;
+		};
+		AB6E98902D5D3CE600C351F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = alexvaos.TakeoverUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Takeover;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AB6E985C2D5D3CE400C351F6 /* Build configuration list for PBXProject "Takeover" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB6E98862D5D3CE600C351F6 /* Debug */,
+				AB6E98872D5D3CE600C351F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB6E98882D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "Takeover" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB6E98892D5D3CE600C351F6 /* Debug */,
+				AB6E988A2D5D3CE600C351F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB6E988B2D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "TakeoverTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB6E988C2D5D3CE600C351F6 /* Debug */,
+				AB6E988D2D5D3CE600C351F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB6E988E2D5D3CE600C351F6 /* Build configuration list for PBXNativeTarget "TakeoverUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB6E988F2D5D3CE600C351F6 /* Debug */,
+				AB6E98902D5D3CE600C351F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AB6E98592D5D3CE400C351F6 /* Project object */;
+}
