@@ -9,8 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class LinkItem {
-    
+class LinkItem: ObservableObject {
     var name: String
     var from: String?
     var to: String?
@@ -20,4 +19,19 @@ final class LinkItem {
         self.from = from
         self.to = to
     }
+    
+    static func emptyLinkItem() -> LinkItem {
+        return LinkItem(
+            name: "",
+            from: "",
+            to: ""
+        )
+    }
+}
+
+extension LinkItem {
+    static let samples = [
+        LinkItem(name: "Fonts"),
+        LinkItem(name: "Audio Plugins")
+    ]
 }

@@ -15,16 +15,16 @@ struct ContentView: View {
     var body: some View {
 //        LinkItemList(linkItems: linkItems)
         List {
-            ForEach(linkItems) { linkItem in
-                Text("\(linkItem.title)")
-            }
+//            ForEach(linkItems) { linkItem in
+//                Text("\(linkItem.title)")
+//            }
         }
         
     }
 
 }
 
-struct PretendView: View {
+struct ChildView: View {
     var linkItems: [LinkItem] = []
 
     init(linkItems: [LinkItem]) {

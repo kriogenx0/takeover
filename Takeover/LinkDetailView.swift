@@ -11,8 +11,7 @@ struct LinkDetailView: View {
     
     @Binding var linkItem: LinkItem?
     
-    @State var formToPath = ""
-    @State var formFromPath = ""
+    @State var form: LinkItem = LinkItem.emptyLinkItem()
     
 //    init(linkItem: LinkItem) {
 //        if linkItem != nil {
@@ -26,13 +25,11 @@ struct LinkDetailView: View {
     
     var body: some View {
         VStack (spacing: 20) {
-            if linkItem != nil {
-                Text(linkItem!.name)
-                    .padding(20)
-                
-                TextField("To Path", text: $formToPath)
-                TextField("From Path", text: $formFromPath)
-            }
+//            TextField($form.name ?? "")
+            //                .padding(20)
+            
+//            TextField("To Path", text: $form.to)
+//            TextField("From Path", text: $form.from)
         }
     }
 }
@@ -44,5 +41,5 @@ struct LinkDetailView: View {
         to: "/some/other/path"
     )
 //    var binding = Binding<LinkItem?>(get: { linkItem }, set: { _ in })
-    LinkDetailView(linkItem: linkItem)
+//    LinkDetailView(linkItem: linkItem)
 }
