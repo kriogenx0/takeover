@@ -9,39 +9,24 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-/*
+struct LinkItemListView: View {
+    
+    @Environment(\.modelContext) private var modelContext
 
-struct LinkListView: View {
-    @Query var linkItems: [LinkItem]
-    @State var selection: LinkItem? = nil
-
-    var body: some View {
-        NavigationSplitView {
-            List(linkItems, id: \.self) { record in
-                Text(record.name)
-            }
-            .listStyle(SidebarListStyle())
-        } detail: {
-            LinkDetailView(selection: $selection)
-        } .toolbar(content: {
-            ToolbarItem(content: {
-                Text("Test")
-            })
-        })
+//    @Binding var linkItems: [LinkItem]
+    var linkItems: [LinkItem] = []
+    
+    init(linkItems: [LinkItem]) {
+        self.linkItems = linkItems
     }
-}
-*/
-
-struct LinkItemList: View {
-    @Binding var linkItems: [LinkItem]
-//    @Query var linkItems: [LinkItem]
-    @State private var selection: LinkItem? = nil
+    
+    @State private var linkItemSelection: LinkItem? = nil
     
     var body: some View {
         NavigationSplitView {
-            if $linkItems.count > 0 {
+            if linkItems.count > 0 {
                 List {
-                    ForEach($linkItems) { linkItem in
+                    ForEach(linkItems, id: \.self) { linkItem in
                         NavigationLink {
                             Text("Item at \(linkItem.name)")
                         } label: {
@@ -50,14 +35,16 @@ struct LinkItemList: View {
                     }
                     .onDelete(perform: deleteItems)
                 }
+                .listStyle(SidebarListStyle())
                 .navigationSplitViewColumnWidth(min: 180, ideal: 200)
             } else {
                 Text("No Link Items")
             }
         } detail: {
-            if selection != nil {
-                LinkDetailView(linkItem: $selection)
-            }
+//            if linkItemSelection != nil {
+//                print("Link Item Selection: \(linkItemSelection!.name)")
+//                LinkItemDetailView(linkItem: linkItemSelection!)
+//            }
         }.toolbar(content: {
             ToolbarItem(content: {
                 Button(action: addItem) {
@@ -65,35 +52,46 @@ struct LinkItemList: View {
                 }
             })
         })
-        
     }
     
     private func addItem() {
         withAnimation {
             let newItem = LinkItem(name: Date().formatted())
-//            modelContext.insert(newItem)
+            modelContext.insert(newItem)
         }
     }
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-//                modelContext.delete(items[index])
+                modelContext.delete(linkItems[index])
             }
         }
     }
 }
 
 
+
 #Preview("LinkItemList filled") {
     struct Preview: View {
-        @State var linkItems: [LinkItem] = [
+        var linkItems: [LinkItem] = [
             LinkItem(name: "Apple Music"),
             LinkItem(name: "Another one"),
             LinkItem(name: "A third one")
         ]
         var body: some View {
-            LinkItemList(linkItems: $linkItems)
+            LinkItemListView(linkItems: linkItems)
+        }
+    }
+
+    return Preview()
+}
+
+#Preview("LinkItemList empty") {
+    struct Preview: View {
+        var linkItems: [LinkItem] = []
+        var body: some View {
+            LinkItemListView(linkItems: linkItems)
         }
     }
 

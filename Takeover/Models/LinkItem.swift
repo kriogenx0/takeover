@@ -9,18 +9,18 @@ import Foundation
 import SwiftData
 
 @Model
-class LinkItem: ObservableObject {
+class LinkItem: ObservableObject, Identifiable {
     var name: String
-    var from: String?
-    var to: String?
+    var from: String
+    var to: String
     
-    init(name: String, from: String? = nil, to: String? = nil) {
+    init(name: String, from: String = "", to: String = "") {
         self.name = name
         self.from = from
         self.to = to
     }
     
-    static func emptyLinkItem() -> LinkItem {
+    static func empty() -> LinkItem {
         return LinkItem(
             name: "",
             from: "",
