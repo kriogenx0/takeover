@@ -9,10 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Query private var linkItems: [LinkItem]
-
     var body: some View {
-        LinkItemListView(linkItems: linkItems)
+        LinkItemListView()
     }
 }
 

@@ -13,13 +13,9 @@ struct LinkItemListView: View {
     
     @Environment(\.modelContext) private var modelContext
 
+    @Query private var linkItems: [LinkItem] // Use @Query to fetch data
+    //    var linkItems: [LinkItem] = []
 //    @Binding var linkItems: [LinkItem]
-    var linkItems: [LinkItem] = []
-    
-    init(linkItems: [LinkItem]) {
-        self.linkItems = linkItems
-    }
-    
     @State private var linkItemSelection: LinkItem? = nil
     
     var body: some View {
@@ -41,17 +37,17 @@ struct LinkItemListView: View {
                 Text("No Link Items")
             }
         } detail: {
-//            if linkItemSelection != nil {
+            if linkItemSelection != nil {
 //                print("Link Item Selection: \(linkItemSelection!.name)")
-//                LinkItemDetailView(linkItem: linkItemSelection!)
-//            }
-        }.toolbar(content: {
+                LinkItemDetailView(linkItem: linkItemSelection!)
+            }
+        }/*.toolbar(content: {
             ToolbarItem(content: {
                 Button(action: addItem) {
                     Label("Add Item", systemImage: "plus")
                 }
             })
-        })
+        })*/
     }
     
     private func addItem() {
@@ -73,6 +69,7 @@ struct LinkItemListView: View {
 
 
 #Preview("LinkItemList filled") {
+    /*
     struct Preview: View {
         var linkItems: [LinkItem] = [
             LinkItem(name: "Apple Music"),
@@ -85,8 +82,13 @@ struct LinkItemListView: View {
     }
 
     return Preview()
+    */
+
+    LinkItemListView()
+            .modelContainer(for: LinkItem.self, inMemory: true)
 }
 
+/*
 #Preview("LinkItemList empty") {
     struct Preview: View {
         var linkItems: [LinkItem] = []
@@ -97,3 +99,5 @@ struct LinkItemListView: View {
 
     return Preview()
 }
+
+*/
