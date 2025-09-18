@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 
 struct LinkItemDetailView: View {
 //    @Binding var linkItem: LinkItem?
@@ -13,9 +14,10 @@ struct LinkItemDetailView: View {
 
     private var onSave: ((LinkItem) -> Void)? // Closure to handle saving
 
-    init(linkItem: LinkItem) {
+    init(linkItem: LinkItem, onSave: ((LinkItem) -> Void)? = nil) {
         print("Name: \(linkItem.name)")
         self.form = linkItem
+        self.onSave = onSave
     }
 
     var body: some View {
@@ -23,10 +25,32 @@ struct LinkItemDetailView: View {
             TextField("Name", text: $form.name)
 
             HStack {
-                TextField("To Path", text: $form.to)
-                Button("")
+                Text(form.from.isEmpty ? "No path selected" : form.from)
+                    .textSelection(.enabled)
+                    .foregroundColor(form.from.isEmpty ? .secondary : .primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Button("Browse...") {
+                    Task {
+                        if let path = try await selectFile() {
+                            form.from = path
+                        }
+                    }
+                }
             }
-            TextField("From Path", text: $form.from)
+
+            HStack {
+                Text(form.to.isEmpty ? "No path selected" : form.to)
+                    .textSelection(.enabled)
+                    .foregroundColor(form.to.isEmpty ? .secondary : .primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Button("Browse...") {
+                    Task {
+                        if let path = try await selectFile() {
+                            form.to = path
+                        }
+                    }
+                }
+            }
 
             Button("Save") {
                 onSave?(form) // Call the closure with the modified data
@@ -37,7 +61,8 @@ struct LinkItemDetailView: View {
     func selectFile() async throws -> String? {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
         var filename: String?
         if panel.runModal() == .OK {
             filename = panel.url?.lastPathComponent

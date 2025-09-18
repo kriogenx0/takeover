@@ -17,37 +17,42 @@ struct LinkItemListView: View {
     //    var linkItems: [LinkItem] = []
 //    @Binding var linkItems: [LinkItem]
     @State private var linkItemSelection: LinkItem? = nil
-    
+
     var body: some View {
         NavigationSplitView {
             if linkItems.count > 0 {
-                List {
+                List(selection: $linkItemSelection) {
                     ForEach(linkItems, id: \.self) { linkItem in
-                        NavigationLink {
-                            Text("Item at \(linkItem.name)")
-                        } label: {
-                            Text(linkItem.name)
-                        }
+                        Text(linkItem.name)
+                            .tag(linkItem)
                     }
                     .onDelete(perform: deleteItems)
                 }
                 .listStyle(SidebarListStyle())
                 .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+                .onAppear {
+                    // Auto-select first item if nothing is selected and items exist
+                    if linkItemSelection == nil && !linkItems.isEmpty {
+                        linkItemSelection = linkItems.first
+                    }
+                }
             } else {
                 Text("No Link Items")
             }
         } detail: {
-            if linkItemSelection != nil {
-//                print("Link Item Selection: \(linkItemSelection!.name)")
-                LinkItemDetailView(linkItem: linkItemSelection!)
+            if let selectedItem = linkItemSelection {
+                LinkItemDetailView(linkItem: selectedItem)
+            } else {
+                Text("Select a Link Item")
+                    .foregroundColor(.secondary)
             }
-        }/*.toolbar(content: {
+        }.toolbar(content: {
             ToolbarItem(content: {
                 Button(action: addItem) {
                     Label("Add Item", systemImage: "plus")
                 }
             })
-        })*/
+        })
     }
     
     private func addItem() {
@@ -69,23 +74,21 @@ struct LinkItemListView: View {
 
 
 #Preview("LinkItemList filled") {
-    /*
-    struct Preview: View {
-        var linkItems: [LinkItem] = [
-            LinkItem(name: "Apple Music"),
-            LinkItem(name: "Another one"),
-            LinkItem(name: "A third one")
-        ]
-        var body: some View {
-            LinkItemListView(linkItems: linkItems)
-        }
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: LinkItem.self, configurations: config)
+
+    let sampleItems = [
+        LinkItem(name: "Dropbox", from: "/Users/alex/Dropbox", to: "/opt/dropbox"),
+        LinkItem(name: "Adobe Fonts", from: "/Library/Application Support/Adobe/CoreSync/plugins/livetype", to: "/System/Library/Fonts"),
+        LinkItem(name: "Audio Plugins", from: "/Library/Audio/Plug-Ins", to: "/usr/local/audio")
+    ]
+
+    for item in sampleItems {
+        container.mainContext.insert(item)
     }
 
-    return Preview()
-    */
-
-    LinkItemListView()
-            .modelContainer(for: LinkItem.self, inMemory: true)
+    return LinkItemListView()
+        .modelContainer(container)
 }
 
 /*
