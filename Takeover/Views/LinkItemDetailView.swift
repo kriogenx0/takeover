@@ -9,10 +9,9 @@ import SwiftUI
 import AppKit
 
 struct LinkItemDetailView: View {
-//    @Binding var linkItem: LinkItem?
-    @State private var form: LinkItem = LinkItem.empty()
+    @State private var form: LinkItem
 
-    private var onSave: ((LinkItem) -> Void)? // Closure to handle saving
+    private var onSave: ((LinkItem) -> Void)?
 
     init(linkItem: LinkItem, onSave: ((LinkItem) -> Void)? = nil) {
         print("Name: \(linkItem.name)")
@@ -53,8 +52,10 @@ struct LinkItemDetailView: View {
             }
 
             Button("Save") {
-                onSave?(form) // Call the closure with the modified data
+                onSave?(form)
             }
+
+            Spacer()
         }.padding(20)
     }
 
@@ -65,7 +66,7 @@ struct LinkItemDetailView: View {
         panel.canCreateDirectories = true
         var filename: String?
         if panel.runModal() == .OK {
-            filename = panel.url?.lastPathComponent
+            filename = panel.url?.path
         }
         return filename
     }
