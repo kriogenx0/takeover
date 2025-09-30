@@ -12,11 +12,13 @@ struct LinkItemDetailView: View {
     @State private var form: LinkItem
 
     private var onSave: ((LinkItem) -> Void)?
+    private var onRun: ((LinkItem) -> Void)?
 
-    init(linkItem: LinkItem, onSave: ((LinkItem) -> Void)? = nil) {
+    init(linkItem: LinkItem, onSave: ((LinkItem) -> Void)? = nil, onRun: ((LinkItem) -> Void)? = nil) {
         print("Name: \(linkItem.name)")
         self.form = linkItem
         self.onSave = onSave
+        self.onRun = onRun
     }
 
     var body: some View {
@@ -51,8 +53,14 @@ struct LinkItemDetailView: View {
                 }
             }
 
-            Button("Save") {
-                onSave?(form)
+            HStack {
+                Button("Save") {
+                    onSave?(form)
+                }
+
+                Button("Run") {
+                    onRun?(form)
+                }
             }
 
             Spacer()

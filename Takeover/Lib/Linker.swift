@@ -8,8 +8,27 @@
 import Foundation
 
 class Linker {
+    static func isLink(atPath path: String) -> Bool {
+        let url = URL(fileURLWithPath: path)
+        do {
+            let resourceValues = try url.resourceValues(forKeys: [.isSymbolicLinkKey])
+            return resourceValues.isSymbolicLink ?? false
+        } catch {
+            // Handle error, e.g., if the file doesn't exist or is inaccessible
+            print("Error checking symbolic link at \(path): \(error)")
+            return false
+        }
+    }
+
     static func link(from: String, to: String) {
-        shell("ln -s \(from) \(to)")
+//        shell("ln -s \(from) \(to)")
+        let at = URL(fileURLWithPath: from)
+        let withDestinationURL = URL(fileURLWithPath: to)
+        do {
+            try FileManager.default.createSymbolicLink(at: at, withDestinationURL: withDestinationURL)
+        } catch {
+            print("Error creating symlink")
+        }
     }
     
     static func shell(_ command: String) -> String {
