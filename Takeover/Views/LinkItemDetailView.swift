@@ -13,9 +13,13 @@ struct LinkItemDetailView: View {
 
     private var onSave: ((LinkItem) -> Void)?
     private var onRun: ((LinkItem) -> Void)?
+    private var onDelete: ((LinkItem) -> Void)?
 
-    init(linkItem: LinkItem, onSave: ((LinkItem) -> Void)? = nil, onRun: ((LinkItem) -> Void)? = nil) {
-        print("Name: \(linkItem.name)")
+    init(linkItem: LinkItem,
+         onSave: ((LinkItem) -> Void)? = nil,
+         onRun: ((LinkItem) -> Void)? = nil,
+         onDelete: ((LinkItem) -> Void)? = nil) {
+//        print("Name: \(linkItem.name)")
         self.form = linkItem
         self.onSave = onSave
         self.onRun = onRun
@@ -60,6 +64,10 @@ struct LinkItemDetailView: View {
 
                 Button("Run") {
                     onRun?(form)
+                }
+
+                Button("Delete") {
+                    onDelete?(form)
                 }
             }
 

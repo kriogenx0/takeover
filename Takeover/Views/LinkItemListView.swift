@@ -13,7 +13,7 @@ struct LinkItemListView: View {
     
     @Environment(\.modelContext) private var modelContext
 
-    @Query private var linkItems: [LinkItem] // Use @Query to fetch data
+    @Query(sort: \LinkItem.name) private var linkItems: [LinkItem] // Use @Query to fetch data
     //    var linkItems: [LinkItem] = []
 //    @Binding var linkItems: [LinkItem]
     @State private var linkItemSelection: LinkItem? = nil
@@ -41,7 +41,7 @@ struct LinkItemListView: View {
             }
         } detail: {
             if let selectedItem = linkItemSelection {
-                LinkItemDetailView(linkItem: selectedItem)
+                LinkItemDetailView(linkItem: selectedItem, onRun: onRun)
             } else {
                 Text("Select a Link Item")
                     .foregroundColor(.secondary)
@@ -54,11 +54,22 @@ struct LinkItemListView: View {
             })
         })
     }
-    
+
+    private func onRun(linkItem: LinkItem) -> Void {
+        Linker.linkOrMove(from: linkItem.from, to: linkItem.to)
+    }
+
+    private func onDelete(linkItem: LinkItem) -> Void {
+        withAnimation {
+            modelContext.delete(linkItemSelection!)
+        }
+    }
+
     private func addItem() {
         withAnimation {
             let newItem = LinkItem(name: Date().formatted())
             modelContext.insert(newItem)
+            linkItemSelection = newItem
         }
     }
 
