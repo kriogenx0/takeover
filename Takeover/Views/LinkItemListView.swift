@@ -41,7 +41,12 @@ struct LinkItemListView: View {
             }
         } detail: {
             if let selectedItem = linkItemSelection {
-                LinkItemDetailView(linkItem: selectedItem, onRun: onRun)
+                LinkItemDetailView(
+                    linkItem: selectedItem,
+                    onSave: onSave,
+                    onRun: onRun,
+                    onDelete: onDelete
+                )
             } else {
                 Text("Select a Link Item")
                     .foregroundColor(.secondary)
@@ -59,9 +64,20 @@ struct LinkItemListView: View {
         Linker.linkOrMove(from: linkItem.from, to: linkItem.to)
     }
 
+    private func onSave(linkItem: LinkItem) -> Void {
+        // Update the current selection with the form data
+        if let selectedItem = linkItemSelection {
+            selectedItem.name = linkItem.name
+            selectedItem.from = linkItem.from
+            selectedItem.to = linkItem.to
+            try? modelContext.save()
+        }
+    }
+
     private func onDelete(linkItem: LinkItem) -> Void {
         withAnimation {
             modelContext.delete(linkItemSelection!)
+            linkItemSelection = linkItems.first
         }
     }
 
