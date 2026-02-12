@@ -58,16 +58,17 @@ class Linker {
     static func shell(_ command: String) -> String {
         let task = Process()
         let pipe = Pipe()
-        
+
         task.standardOutput = pipe
         task.standardError = pipe
         task.arguments = ["-c", command]
         task.launchPath = "/bin/zsh"
         task.standardInput = nil
         task.launch()
-        
+        task.waitUntilExit()  // Wait for the command to complete
+
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        
-        return String(data: data, encoding: .utf8)!
+
+        return String(data: data, encoding: .utf8) ?? ""
     }
 }

@@ -15,6 +15,7 @@ struct SettingsYaml: Codable {
         var name: String
         var from: String
         var to: String
+        var defaults: String?
     }
 }
 
@@ -28,8 +29,14 @@ class SettingsManager: ObservableObject {
     private init() {}
 
     var iCloudDocumentsURL: URL? {
-        FileManager.default.url(forUbiquityContainerIdentifier: nil)?
-            .appendingPathComponent("Documents")
+        // Use hardcoded iCloud Drive path (doesn't require entitlements)
+        let url = URL(fileURLWithPath: Config.expandedBackupPath)
+
+        // Check if iCloud Drive exists and is accessible
+        var isDirectory: ObjCBool = false
+        let parentExists = FileManager.default.fileExists(atPath: (url.deletingLastPathComponent().path), isDirectory: &isDirectory)
+
+        return parentExists ? url : nil
     }
 
     var localDocumentsURL: URL {

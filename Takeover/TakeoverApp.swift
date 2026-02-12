@@ -29,10 +29,38 @@ struct TakeoverApp: App {
         WindowGroup {
             ContentView()
                 .task {
+                    await ensureICloudDirectoryExists()
                     await loadSettingsAndPopulate()
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private func ensureICloudDirectoryExists() async {
+        let iCloudPath = Config.expandedBackupPath
+
+        print("DEBUG: Checking iCloud directory at: \(iCloudPath)")
+
+        // Use shell command to check if directory exists
+        let escapedPath = iCloudPath.replacingOccurrences(of: "'", with: "'\\''")
+        let checkCommand = "test -d '\(escapedPath)' && echo 'exists' || echo 'not_exists'"
+        let checkResult = Linker.shell(checkCommand).trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if checkResult == "not_exists" {
+            // Directory doesn't exist, create it using osascript (has proper permissions)
+            let escapedPathForOsascript = iCloudPath.replacingOccurrences(of: "\"", with: "\\\"")
+            let createDirScript = "do shell script \"mkdir -p \\\"\(escapedPathForOsascript)\\\"\""
+            print("DEBUG: Creating directory with osascript")
+            let createResult = Linker.shell("osascript -e '\(createDirScript)'")
+
+            if createResult.isEmpty {
+                print("Created iCloud Takeover directory at: \(iCloudPath)")
+            } else {
+                print("DEBUG: osascript result: \(createResult)")
+            }
+        } else {
+            print("DEBUG: iCloud directory already exists at: \(iCloudPath)")
+        }
     }
 
     private func loadSettingsAndPopulate() async {
@@ -61,7 +89,8 @@ struct TakeoverApp: App {
                 let newItem = LinkItem(
                     name: linkConfig.name,
                     from: expandTilde(linkConfig.from),
-                    to: expandTilde(linkConfig.to)
+                    to: expandTilde(linkConfig.to),
+                    defaults: linkConfig.defaults ?? ""
                 )
                 context.insert(newItem)
             }
@@ -71,9 +100,6 @@ struct TakeoverApp: App {
     }
 
     private func expandTilde(_ path: String) -> String {
-        if path.hasPrefix("~") {
-            return NSString(string: path).expandingTildeInPath
-        }
-        return path
+        return PathUtility.expandTildeToRealHome(path)
     }
 }

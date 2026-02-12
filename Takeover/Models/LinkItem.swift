@@ -13,18 +13,21 @@ class LinkItem: ObservableObject, Identifiable {
     var name: String
     var from: String
     var to: String
-    
-    init(name: String, from: String = "", to: String = "") {
+    var defaults: String
+
+    init(name: String, from: String = "", to: String = "", defaults: String = "") {
         self.name = name
         self.from = from
         self.to = to
+        self.defaults = defaults
     }
-    
+
     static func empty() -> LinkItem {
         return LinkItem(
             name: "",
             from: "",
-            to: ""
+            to: "",
+            defaults: ""
         )
     }
 }

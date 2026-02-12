@@ -30,7 +30,7 @@
             "name": "Cyberduck",
             "files": [
                 {
-                    "path": "~/Library/Application\ Support/Cyberduck"
+                    "path": "~/Library/Application Support/Cyberduck"
                 }
             ],
             "defaults": [
@@ -40,13 +40,17 @@
         {
             "name": "TablePlus",
             "files": [
-                
+                {
+                    "path": "~/Library/Application Support/com.tinyapp.TablePlus"
+                }
             ]
         },
         {
             "name": "Audio Plug-Ins",
             "files": [
-                "/Library/Audio/Plug-Ins"
+                {
+                    "path": "/Library/Audio/Plug-Ins"
+                }
             ]
         }
     ]
