@@ -9,7 +9,7 @@ import Foundation
 
 struct Config {
     /// The backup path where Takeover stores its backups
-    static let backupPath = "~/Documents/Takeover"
+    static let backupPath = "~/Library/Application Support/Takeover"
 
     /// Returns the expanded backup path (with ~ resolved to real home directory)
     static var expandedBackupPath: String {

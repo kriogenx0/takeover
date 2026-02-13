@@ -29,11 +29,22 @@ struct TakeoverApp: App {
         WindowGroup {
             ContentView()
                 .task {
+                    await checkPermissionsOnStartup()
                     await ensureICloudDirectoryExists()
                     await loadSettingsAndPopulate()
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private func checkPermissionsOnStartup() async {
+        // Check if app has Full Disk Access
+        if !PermissionsHelper.hasFullDiskAccess() {
+            print("⚠️ Full Disk Access not granted")
+            print("The app will prompt for permissions when you try to install a link")
+        } else {
+            print("✅ Full Disk Access granted")
+        }
     }
 
     private func ensureICloudDirectoryExists() async {

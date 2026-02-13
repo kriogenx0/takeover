@@ -18,10 +18,6 @@ struct LinkItemListView: View {
 //    @Binding var linkItems: [LinkItem]
     @State private var linkItemSelection: LinkItem? = nil
     @State private var showRecipesView = false
-    @State private var showConflictAlert = false
-    @State private var conflictLinkItem: LinkItem?
-    @State private var conflictFromPath: String = ""
-    @State private var conflictToPath: String = ""
 
     var body: some View {
         NavigationSplitView {
@@ -75,23 +71,6 @@ struct LinkItemListView: View {
                 linkItemSelection = newItem
             })
         }
-        .alert("Conflict: Both Locations Exist", isPresented: $showConflictAlert) {
-            Button("Keep From (Original)", role: .destructive) {
-                if let item = conflictLinkItem {
-                    resolveConflict(linkItem: item, keepFrom: true)
-                }
-            }
-            Button("Keep To (Backup)", role: .destructive) {
-                if let item = conflictLinkItem {
-                    resolveConflict(linkItem: item, keepFrom: false)
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                conflictLinkItem = nil
-            }
-        } message: {
-            Text("Both the original location and backup location have existing files. Which one would you like to keep? The other will be moved to iCloud with a 'backup' suffix and date.")
-        }
     }
 
     private func pullFromRepository() {
@@ -133,181 +112,12 @@ struct LinkItemListView: View {
         try? modelContext.save()
     }
 
-    private func expandTilde(_ path: String) -> String {
-        return PathUtility.expandTildeToRealHome(path)
-    }
-
     private func onRun(linkItem: LinkItem) -> Void {
-        // Generate the full destination path (backup location in iCloud)
-        let toPath = "\(Config.expandedBackupPath)/\(linkItem.to)"
-
-        // Expand the from path (original app location)
-        let fromPath = PathUtility.expandTildeToRealHome(linkItem.from)
-
-        // Use shell commands to check existence (bypasses sandbox restrictions)
-        let escapedFromPath = fromPath.replacingOccurrences(of: "'", with: "'\\''")
-        let escapedToPath = toPath.replacingOccurrences(of: "'", with: "'\\''")
-
-        let fromExistsResult = Linker.shell("test -e '\(escapedFromPath)' && echo 'yes' || echo 'no'").trimmingCharacters(in: .whitespacesAndNewlines)
-        let toExistsResult = Linker.shell("test -e '\(escapedToPath)' && echo 'yes' || echo 'no'").trimmingCharacters(in: .whitespacesAndNewlines)
-
-        let fromExists = (fromExistsResult == "yes")
-        let toExists = (toExistsResult == "yes")
-
-        var isFromSymlink = false
-        var isToSymlink = false
-
-        if fromExists {
-            let symlinkCheck = Linker.shell("test -L '\(escapedFromPath)' && echo 'yes' || echo 'no'").trimmingCharacters(in: .whitespacesAndNewlines)
-            isFromSymlink = (symlinkCheck == "yes")
-        }
-
-        if toExists {
-            let symlinkCheck = Linker.shell("test -L '\(escapedToPath)' && echo 'yes' || echo 'no'").trimmingCharacters(in: .whitespacesAndNewlines)
-            isToSymlink = (symlinkCheck == "yes")
-        }
-
-        // Case 1: Both exist and neither is a symlink - conflict!
-        if fromExists && !isFromSymlink && toExists && !isToSymlink {
-            conflictLinkItem = linkItem
-            conflictFromPath = fromPath
-            conflictToPath = toPath
-            showConflictAlert = true
-            return
-        }
-
-        // Case 2: From exists and is not a symlink - move it to backup location
-        if fromExists && !isFromSymlink {
-            print("Moving '\(fromPath)' to '\(toPath)'")
-
-            // Create parent directory if needed using osascript (has proper permissions)
-            let parentDir = (toPath as NSString).deletingLastPathComponent
-            let escapedParentDir = parentDir.replacingOccurrences(of: "\"", with: "\\\"")
-            let createDirScript = "do shell script \"mkdir -p \\\"\(escapedParentDir)\\\"\""
-            print("DEBUG: Creating directory with osascript")
-            let osascriptResult = Linker.shell("osascript -e '\(createDirScript)'")
-            if !osascriptResult.isEmpty {
-                print("DEBUG: osascript result: \(osascriptResult)")
-            }
-
-            // Copy the file/folder using ditto (macOS native tool that handles permissions better)
-            let escapedFromForOsascript = fromPath.replacingOccurrences(of: "\"", with: "\\\"")
-            let escapedToForOsascript = toPath.replacingOccurrences(of: "\"", with: "\\\"")
-            let copyScript = "do shell script \"ditto \\\"\(escapedFromForOsascript)\\\" \\\"\(escapedToForOsascript)\\\"\""
-            print("DEBUG: Copying with osascript and ditto")
-            let cpResult = Linker.shell("osascript -e '\(copyScript)'")
-            if !cpResult.isEmpty {
-                print("Error copying file: \(cpResult)")
-                return
-            }
-            print("DEBUG: Copy successful")
-
-            // Remove the original using osascript
-            let removeScript = "do shell script \"rm -rf \\\"\(escapedFromForOsascript)\\\"\""
-            print("DEBUG: Removing original with osascript")
-            let rmResult = Linker.shell("osascript -e '\(removeScript)'")
-            if !rmResult.isEmpty {
-                print("Error removing original: \(rmResult)")
-                return
-            }
-            print("DEBUG: Remove successful")
-        }
-
-        // Case 3: Create symlink from original location to backup location
-        print("Creating symlink at '\(fromPath)' -> '\(toPath)'")
-        Linker.linkOrMove(from: toPath, to: fromPath)
-
-        // Run defaults command if present
-        if !linkItem.defaults.isEmpty {
-            let result = Linker.shell(linkItem.defaults)
-            print("Defaults command result: \(result)")
-        }
-    }
-
-    private func resolveConflict(linkItem: LinkItem, keepFrom: Bool) {
-        let toPath = "\(Config.expandedBackupPath)/\(linkItem.to)"
-        let fromPath = PathUtility.expandTildeToRealHome(linkItem.from)
-
-        // Generate backup name with date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd-HHmmss"
-        let dateString = dateFormatter.string(from: Date())
-        let backupName = "\(linkItem.to)-backup-\(dateString)"
-        let backupPath = "\(Config.expandedBackupPath)/\(backupName)"
-
-        // Escape paths for osascript
-        let escapedToPath = toPath.replacingOccurrences(of: "\"", with: "\\\"")
-        let escapedFromPath = fromPath.replacingOccurrences(of: "\"", with: "\\\"")
-        let escapedBackupPath = backupPath.replacingOccurrences(of: "\"", with: "\\\"")
-
-        if keepFrom {
-            // Keep from (original), move to (backup) to backup location
-            print("Moving backup '\(toPath)' to '\(backupPath)'")
-            let copyScript1 = "do shell script \"ditto \\\"\(escapedToPath)\\\" \\\"\(escapedBackupPath)\\\"\""
-            let cpResult1 = Linker.shell("osascript -e '\(copyScript1)'")
-            if !cpResult1.isEmpty {
-                print("Error copying backup: \(cpResult1)")
-                return
-            }
-            let removeScript1 = "do shell script \"rm -rf \\\"\(escapedToPath)\\\"\""
-            let rmResult1 = Linker.shell("osascript -e '\(removeScript1)'")
-            if !rmResult1.isEmpty {
-                print("Error removing backup: \(rmResult1)")
-                return
-            }
-
-            // Move from to to location
-            print("Moving '\(fromPath)' to '\(toPath)'")
-            let copyScript2 = "do shell script \"ditto \\\"\(escapedFromPath)\\\" \\\"\(escapedToPath)\\\"\""
-            let cpResult2 = Linker.shell("osascript -e '\(copyScript2)'")
-            if !cpResult2.isEmpty {
-                print("Error copying from: \(cpResult2)")
-                return
-            }
-            let removeScript2 = "do shell script \"rm -rf \\\"\(escapedFromPath)\\\"\""
-            let rmResult2 = Linker.shell("osascript -e '\(removeScript2)'")
-            if !rmResult2.isEmpty {
-                print("Error removing from: \(rmResult2)")
-                return
-            }
-        } else {
-            // Keep to (backup), move from (original) to backup location
-            print("Moving original '\(fromPath)' to '\(backupPath)'")
-            let copyScript = "do shell script \"ditto \\\"\(escapedFromPath)\\\" \\\"\(escapedBackupPath)\\\"\""
-            let cpResult = Linker.shell("osascript -e '\(copyScript)'")
-            if !cpResult.isEmpty {
-                print("Error copying original: \(cpResult)")
-                return
-            }
-            let removeScript = "do shell script \"rm -rf \\\"\(escapedFromPath)\\\"\""
-            let rmResult = Linker.shell("osascript -e '\(removeScript)'")
-            if !rmResult.isEmpty {
-                print("Error removing original: \(rmResult)")
-                return
-            }
-        }
-
-        // Create symlink
-        print("Creating symlink at '\(fromPath)' -> '\(toPath)'")
-        Linker.linkOrMove(from: toPath, to: fromPath)
-
-        // Run defaults command if present
-        if !linkItem.defaults.isEmpty {
-            let result = Linker.shell(linkItem.defaults)
-            print("Defaults command result: \(result)")
-        }
-
-        // Clear conflict state
-        conflictLinkItem = nil
-        conflictFromPath = ""
-        conflictToPath = ""
+        LinkItemInstaller.install(linkItem: linkItem)
     }
 
     private func onUninstall(linkItem: LinkItem) -> Void {
-        // Delete the symlink at the "from" path
-        let fromPath = PathUtility.expandTildeToRealHome(linkItem.from)
-        let result = Linker.shell("rm '\(fromPath)'")
-        print("Uninstall result: \(result)")
+        LinkItemInstaller.uninstall(linkItem: linkItem)
     }
 
     private func onSave(linkItem: LinkItem) -> Void {
@@ -440,16 +250,10 @@ struct LinkItemListView: View {
         .modelContainer(container)
 }
 
-/*
 #Preview("LinkItemList empty") {
-    struct Preview: View {
-        var linkItems: [LinkItem] = []
-        var body: some View {
-            LinkItemListView(linkItems: linkItems)
-        }
-    }
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: LinkItem.self, configurations: config)
 
-    return Preview()
+    return LinkItemListView()
+        .modelContainer(container)
 }
-
-*/

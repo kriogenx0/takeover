@@ -70,7 +70,7 @@ class SettingsManager: ObservableObject {
 
         // Check if file exists, if not create a default one
         if !FileManager.default.fileExists(atPath: fileURL.path) {
-            try createDefaultSettings(at: fileURL)
+            try createEmptySettings(at: fileURL)
             print("Created default settings at: \(fileURL.path)")
             print("Using iCloud: \(usingICloud)")
         }
@@ -101,15 +101,9 @@ class SettingsManager: ObservableObject {
         }
     }
 
-    private func createDefaultSettings(at url: URL) throws {
+    private func createEmptySettings(at url: URL) throws {
         let defaultSettings = """
         links:
-          - name: "Example - Fonts"
-            from: "~/Library/Fonts"
-            to: "~/Documents/Takeover/Fonts"
-          - name: "Example - Audio Plugins"
-            from: "~/Library/Audio/Plug-Ins"
-            to: "~/Documents/Takeover/AudioPlugins"
         """
 
         try defaultSettings.write(to: url, atomically: true, encoding: .utf8)
