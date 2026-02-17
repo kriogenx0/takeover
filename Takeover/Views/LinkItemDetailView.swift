@@ -39,15 +39,6 @@ struct LinkItemDetailView: View {
                     Text("App Name")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    if symlinkIsValid {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .help("Symlink is installed and points to the correct location")
-                    } else if !linkItem.from.isEmpty || !linkItem.to.isEmpty {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.red)
-                            .help("Symlink is not installed")
-                    }
                 }
                 TextField("Name", text: $linkItem.name)
                     .textFieldStyle(.roundedBorder)
@@ -178,11 +169,21 @@ struct LinkItemDetailView: View {
 
                 Spacer()
 
+                if symlinkIsValid {
+                    Image(systemName: "square.and.arrow.down.badge.checkmark.fill")
+                        .foregroundColor(.green)
+                        .help("Symlink is installed and points to the correct location")
+                } else if !linkItem.from.isEmpty || !linkItem.to.isEmpty {
+                    Image(systemName: "square.and.arrow.down.badge.xmark.fill")
+                        .foregroundColor(.red)
+                        .help("Symlink is not installed")
+                }
+
                 if !linkItem.to.isEmpty {
                     Button("Uninstall") {
                         onUninstall?(linkItem)
                     }
-                    .disabled(linkItem.from.isEmpty)
+                    .disabled(!symlinkIsValid)
                 }
 
                 Button("Install") {
