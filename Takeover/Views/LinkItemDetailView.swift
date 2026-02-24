@@ -179,18 +179,17 @@ struct LinkItemDetailView: View {
                         .help("Symlink is not installed")
                 }
 
-                if !linkItem.to.isEmpty {
+                if symlinkIsValid {
                     Button("Uninstall") {
                         onUninstall?(linkItem)
                     }
-                    .disabled(!symlinkIsValid)
+                } else {
+                    Button("Install") {
+                        onRun?(linkItem)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(linkItem.from.isEmpty || linkItem.to.isEmpty)
                 }
-
-                Button("Install") {
-                    onRun?(linkItem)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(linkItem.from.isEmpty || linkItem.to.isEmpty)
             }
         }
         .padding(24)
