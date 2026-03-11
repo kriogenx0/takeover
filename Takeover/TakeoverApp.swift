@@ -32,6 +32,7 @@ struct TakeoverApp: App {
                     await checkPermissionsOnStartup()
                     await ensureICloudDirectoryExists()
                     await loadSettingsAndPopulate()
+                    await Repository.shared.load()
                 }
         }
         .modelContainer(sharedModelContainer)

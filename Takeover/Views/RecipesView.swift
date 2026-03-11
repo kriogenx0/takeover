@@ -12,11 +12,7 @@ struct RecipesView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var existingLinks: [LinkItem]
-    @State private var repository = Repository()
-    @State private var recipes: [AppConfig] = []
-    @State private var osRecipes: [OSRecipe] = []
-    @State private var isLoading = true
-    @State private var errorMessage: String?
+    private var repository = Repository.shared
 
     var onAdd: ((LinkItem) -> Void)?
 
@@ -37,18 +33,18 @@ struct RecipesView: View {
 
             Divider()
 
-            if isLoading {
+            if repository.isLoading {
                 VStack {
                     Spacer()
                     ProgressView("Loading recipes...")
                     Spacer()
                 }
-            } else if let error = errorMessage {
+            } else if let error = repository.error {
                 VStack {
                     Spacer()
                     Text("Error loading recipes")
                         .font(.headline)
-                    Text(error)
+                    Text(error.localizedDescription)
                         .foregroundColor(.secondary)
                         .padding()
                     Spacer()
@@ -79,13 +75,11 @@ struct RecipesView: View {
             }
         }
         .frame(minWidth: 600, minHeight: 400)
-        .onAppear {
-            loadRecipes()
-        }
     }
 
     private var sortedRecipes: [AppConfig] {
-        recipes.sorted { recipe1, recipe2 in
+        let apps = repository.response?.apps ?? []
+        return apps.sorted { recipe1, recipe2 in
             let exists1 = isRecipeAlreadyAdded(recipe1)
             let exists2 = isRecipeAlreadyAdded(recipe2)
 
@@ -102,21 +96,6 @@ struct RecipesView: View {
     private func isRecipeAlreadyAdded(_ app: AppConfig) -> Bool {
         let existingNames = Set(existingLinks.map { $0.name })
         return existingNames.contains(app.name)
-    }
-
-    private func loadRecipes() {
-        repository.fetch { result in
-            DispatchQueue.main.async {
-                isLoading = false
-                switch result {
-                case .success(let response):
-                    recipes = response.apps
-                    osRecipes = response.os_recipies ?? []
-                case .failure(let error):
-                    errorMessage = error.localizedDescription
-                }
-            }
-        }
     }
 
     private func addRecipeToLinks(_ app: AppConfig) {

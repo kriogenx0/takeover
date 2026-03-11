@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import Observation
 
 struct RepositoryResponse: Decodable {
+    let version: Int
     let os_recipies: [OSRecipe]?
     let apps: [AppConfig]
 
     enum CodingKeys: String, CodingKey {
+        case version
         case os_recipies
         case apps
     }
@@ -61,28 +64,53 @@ struct FileConfig: Decodable {
     }
 }
 
-struct Repository {
-    let fileName = "Repository"
+@Observable
+class Repository {
+    static let shared = Repository()
 
-    func fetch(completion: @escaping (Result<RepositoryResponse, Error>) -> Void) {
-        // Load local file
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: "json") else {
-            completion(.failure(NSError(domain: "Repository", code: 404, userInfo: [NSLocalizedDescriptionKey: "Failed to find \(fileName) in bundle."])))
+    private(set) var response: RepositoryResponse?
+    private(set) var isLoading = false
+    private(set) var error: Error?
+
+    private let remoteURL = URL(string: "https://raw.githubusercontent.com/kriogenx0/takeover/main/api/repository.json")!
+    private let cacheURL: URL = {
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        return caches.appendingPathComponent("Repository.json")
+    }()
+    private let cacheDateKey = "RepositoryCacheDate"
+    private let cacheDuration: TimeInterval = 86400 // 1 day
+
+    private init() {}
+
+    func load() async {
+        isLoading = true
+        error = nil
+        defer { isLoading = false }
+
+        // Return cached data if it's fresh
+        if let cachedDate = UserDefaults.standard.object(forKey: cacheDateKey) as? Date,
+           Date().timeIntervalSince(cachedDate) < cacheDuration,
+           let data = try? Data(contentsOf: cacheURL),
+           let cached = try? JSONDecoder().decode(RepositoryResponse.self, from: data) {
+            response = cached
             return
         }
-        do {
-            let data = try Data(contentsOf: url)
-            if let response = parseJson(data) {
-                completion(.success(response))
-            } else {
-                completion(.failure(NSError(domain: "Repository", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON"])))
-            }
-        } catch {
-            completion(.failure(error))
-        }
-    }
 
-    func parseJson(_ data: Data) -> RepositoryResponse? {
-        return try? JSONDecoder().decode(RepositoryResponse.self, from: data)
+        // Fetch from network
+        do {
+            let (data, _) = try await URLSession.shared.data(from: remoteURL)
+            let decoded = try JSONDecoder().decode(RepositoryResponse.self, from: data)
+            try data.write(to: cacheURL)
+            UserDefaults.standard.set(Date(), forKey: cacheDateKey)
+            response = decoded
+        } catch let fetchError {
+            // Fall back to stale cache if available
+            if let data = try? Data(contentsOf: cacheURL),
+               let cached = try? JSONDecoder().decode(RepositoryResponse.self, from: data) {
+                response = cached
+            } else {
+                error = fetchError
+            }
+        }
     }
 }
