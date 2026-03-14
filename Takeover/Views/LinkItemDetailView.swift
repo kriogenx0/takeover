@@ -183,12 +183,13 @@ struct LinkItemDetailView: View {
                     Button("Uninstall") {
                         onUninstall?(linkItem)
                     }
+                    .disabled(!symlinkIsValid)
                 } else {
                     Button("Install") {
                         onRun?(linkItem)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(linkItem.from.isEmpty || linkItem.to.isEmpty)
+                    .disabled(linkItem.from.isEmpty || linkItem.to.isEmpty || symlinkIsValid)
                 }
             }
         }
