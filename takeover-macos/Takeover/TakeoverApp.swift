@@ -38,11 +38,11 @@ struct TakeoverApp: App {
         .modelContainer(sharedModelContainer)
     }
 
+    @MainActor
     private func checkPermissionsOnStartup() async {
-        // Check if app has Full Disk Access
         if !PermissionsHelper.hasFullDiskAccess() {
             print("⚠️ Full Disk Access not granted")
-            print("The app will prompt for permissions when you try to install a link")
+            PermissionsHelper.showFullDiskAccessAlert()
         } else {
             print("✅ Full Disk Access granted")
         }

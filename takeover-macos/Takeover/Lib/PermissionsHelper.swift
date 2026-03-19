@@ -23,6 +23,7 @@ struct PermissionsHelper {
     }
 
     /// Show an alert guiding the user to grant Full Disk Access
+    @MainActor
     static func showFullDiskAccessAlert() {
         let alert = NSAlert()
         alert.messageText = "Full Disk Access Required"
@@ -54,6 +55,7 @@ struct PermissionsHelper {
 
     /// Check permissions and show alert if needed
     /// Returns true if app has required permissions, false otherwise
+    @MainActor
     static func checkAndRequestPermissions() -> Bool {
         if !hasFullDiskAccess() {
             showFullDiskAccessAlert()

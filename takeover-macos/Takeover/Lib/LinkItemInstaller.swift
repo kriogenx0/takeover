@@ -10,6 +10,7 @@ import Foundation
 struct LinkItemInstaller {
 
     /// Installs a LinkItem by creating a backup and symlink
+    @MainActor
     static func install(linkItem: LinkItem) {
         // Check if we have Full Disk Access permissions
         if !PermissionsHelper.checkAndRequestPermissions() {
@@ -176,6 +177,7 @@ struct LinkItemInstaller {
     }
 
     /// Uninstalls a LinkItem by removing the symlink
+    @MainActor
     static func uninstall(linkItem: LinkItem) {
         // Check if we have Full Disk Access permissions
         if !PermissionsHelper.checkAndRequestPermissions() {
