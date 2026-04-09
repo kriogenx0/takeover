@@ -10,13 +10,6 @@ import Yams
 
 struct SettingsYaml: Codable {
     var links: [LinkConfig]
-
-    struct LinkConfig: Codable {
-        var name: String
-        var from: String
-        var to: String
-        var defaults: String?
-    }
 }
 
 class SettingsManager: ObservableObject {

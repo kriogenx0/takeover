@@ -16,6 +16,10 @@ struct RecipesView: View {
 
     var onAdd: ((LinkItem) -> Void)?
 
+    init(onAdd: ((LinkItem) -> Void)? = nil) {
+        self.onAdd = onAdd
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header

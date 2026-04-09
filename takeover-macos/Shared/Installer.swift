@@ -6,7 +6,7 @@ struct Installer {
     // MARK: - Status
 
     static func isInstalled(_ link: LinkConfig) -> Bool {
-        isSymlink(atPath: PathUtility.expandTilde(link.from))
+        isSymlink(atPath: PathUtility.expandTildeToRealHome(link.from))
     }
 
     static func isSymlink(atPath path: String) -> Bool {
@@ -48,7 +48,7 @@ struct Installer {
     // MARK: - Install
 
     static func install(_ link: LinkConfig) -> Result<Void, InstallError> {
-        let fromPath = PathUtility.expandTilde(link.from)
+        let fromPath = PathUtility.expandTildeToRealHome(link.from)
         let toPath = "\(Config.expandedBackupPath)/\(link.to)"
 
         if isSymlink(atPath: fromPath) {
@@ -102,7 +102,7 @@ struct Installer {
     // MARK: - Uninstall
 
     static func uninstall(_ link: LinkConfig) -> Result<Void, InstallError> {
-        let fromPath = PathUtility.expandTilde(link.from)
+        let fromPath = PathUtility.expandTildeToRealHome(link.from)
 
         guard isSymlink(atPath: fromPath) else {
             return .failure(.notInstalled)

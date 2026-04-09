@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ABCC00042F400004000A0004 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = ABCC00052F400005000A0005 /* Yams */; };
 		ABD92F932F3E798B009A6756 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = ABDECCCC2EBBCD76000D9898 /* Yams */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +32,30 @@
 		AB6E98612D5D3CE400C351F6 /* Takeover.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Takeover.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E98742D5D3CE600C351F6 /* TakeoverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TakeoverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TakeoverUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABCC00032F400003000A0003 /* takeover */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = takeover; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AB16E5AE2F88407B00D77A45 /* Exceptions for "Shared" folder in "TakeoverCLI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Data/Repository.swift,
+				Lib/Linker.swift,
+				Lib/LinkItemInstaller.swift,
+				Lib/PermissionsHelper.swift,
+				Models/LinkItem.swift,
+				Models/SettingsYaml.swift,
+			);
+			target = ABCC00082F400008000A0008 /* TakeoverCLI */;
+		};
+		AB16E5AF2F8840A900D77A45 /* Exceptions for "Shared" folder in "Takeover" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Installer.swift,
+			);
+			target = AB6E98602D5D3CE400C351F6 /* Takeover */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AB6E98632D5D3CE400C351F6 /* Takeover */ = {
@@ -47,6 +71,20 @@
 		AB6E98812D5D3CE600C351F6 /* TakeoverUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TakeoverUITests;
+			sourceTree = "<group>";
+		};
+		ABCC00012F400001000A0001 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AB16E5AF2F8840A900D77A45 /* Exceptions for "Shared" folder in "Takeover" target */,
+				AB16E5AE2F88407B00D77A45 /* Exceptions for "Shared" folder in "TakeoverCLI" target */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		ABCC00022F400002000A0002 /* TakeoverCLI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TakeoverCLI;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -74,13 +112,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ABCC00072F400007000A0007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCC00042F400004000A0004 /* Yams in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		AB6E98582D5D3CE400C351F6 = {
 			isa = PBXGroup;
 			children = (
+				ABCC00012F400001000A0001 /* Shared */,
 				AB6E98632D5D3CE400C351F6 /* Takeover */,
+				ABCC00022F400002000A0002 /* TakeoverCLI */,
 				AB6E98772D5D3CE600C351F6 /* TakeoverTests */,
 				AB6E98812D5D3CE600C351F6 /* TakeoverUITests */,
 				AB6E98622D5D3CE400C351F6 /* Products */,
@@ -93,6 +141,7 @@
 				AB6E98612D5D3CE400C351F6 /* Takeover.app */,
 				AB6E98742D5D3CE600C351F6 /* TakeoverTests.xctest */,
 				AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */,
+				ABCC00032F400003000A0003 /* takeover */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,6 +163,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				AB6E98632D5D3CE400C351F6 /* Takeover */,
+				ABCC00012F400001000A0001 /* Shared */,
 			);
 			name = Takeover;
 			packageProductDependencies = (
@@ -169,6 +219,29 @@
 			productReference = AB6E987E2D5D3CE600C351F6 /* TakeoverUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		ABCC00082F400008000A0008 /* TakeoverCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABCC00092F400009000A0009 /* Build configuration list for PBXNativeTarget "TakeoverCLI" */;
+			buildPhases = (
+				ABCC00062F400006000A0006 /* Sources */,
+				ABCC00072F400007000A0007 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				ABCC00012F400001000A0001 /* Shared */,
+				ABCC00022F400002000A0002 /* TakeoverCLI */,
+			);
+			name = TakeoverCLI;
+			packageProductDependencies = (
+				ABCC00052F400005000A0005 /* Yams */,
+			);
+			productName = TakeoverCLI;
+			productReference = ABCC00032F400003000A0003 /* takeover */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -190,6 +263,9 @@
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = AB6E98602D5D3CE400C351F6;
 					};
+					ABCC00082F400008000A0008 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 				};
 			};
 			buildConfigurationList = AB6E985C2D5D3CE400C351F6 /* Build configuration list for PBXProject "Takeover" */;
@@ -210,6 +286,7 @@
 			projectRoot = "";
 			targets = (
 				AB6E98602D5D3CE400C351F6 /* Takeover */,
+				ABCC00082F400008000A0008 /* TakeoverCLI */,
 				AB6E98732D5D3CE600C351F6 /* TakeoverTests */,
 				AB6E987D2D5D3CE600C351F6 /* TakeoverUITests */,
 			);
@@ -256,6 +333,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AB6E987A2D5D3CE600C351F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABCC00062F400006000A0006 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -514,6 +598,34 @@
 			};
 			name = Release;
 		};
+		ABCC000A2F40000A000A000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X52RMDT339;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = takeover;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		ABCC000B2F40000B000A000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X52RMDT339;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = takeover;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -553,6 +665,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		ABCC00092F400009000A0009 /* Build configuration list for PBXNativeTarget "TakeoverCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABCC000A2F40000A000A000A /* Debug */,
+				ABCC000B2F40000B000A000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -567,6 +688,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		ABCC00052F400005000A0005 /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ABDECCCB2EBBCD75000D9898 /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
 		ABDECCCC2EBBCD76000D9898 /* Yams */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = ABDECCCB2EBBCD75000D9898 /* XCRemoteSwiftPackageReference "Yams" */;

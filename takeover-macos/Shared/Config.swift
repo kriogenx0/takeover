@@ -1,10 +1,10 @@
 import Foundation
 
 struct Config {
-    static let backupBasePath = "~/Library/Application Support/Takeover"
+    static let backupPath = "~/Library/Application Support/Takeover"
 
     static var expandedBackupPath: String {
-        PathUtility.expandTilde(backupBasePath)
+        PathUtility.expandTildeToRealHome(backupPath)
     }
 
     static var settingsPath: String {

@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Takeover}/takeover-shell",
+            "name": "Debug takeover-shell (takeover-shell)",
+            "target": "takeover-shell",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug takeover-shell (takeover-shell)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Takeover}/takeover-shell",
+            "name": "Release takeover-shell (takeover-shell)",
+            "target": "takeover-shell",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release takeover-shell (takeover-shell)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Takeover}/takeover-shell",
+            "name": "Debug takeover (takeover-shell)",
+            "target": "takeover",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug takeover (takeover-shell)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Takeover}/takeover-shell",
+            "name": "Release takeover (takeover-shell)",
+            "target": "takeover",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release takeover (takeover-shell)"
+        }
+    ]
+}

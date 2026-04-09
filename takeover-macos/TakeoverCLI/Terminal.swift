@@ -51,14 +51,13 @@ final class RawTerminal {
         guard read(STDIN_FILENO, &c, 1) == 1 else { return .other }
 
         if c == 27 {  // ESC – try to read arrow key sequence
-            // Temporarily switch to non-blocking so we can check for [ and letter
             let flags = fcntl(STDIN_FILENO, F_GETFL, 0)
             fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK)
             var a: UInt8 = 0
             var b: UInt8 = 0
             let n1 = read(STDIN_FILENO, &a, 1)
             let n2 = read(STDIN_FILENO, &b, 1)
-            fcntl(STDIN_FILENO, F_SETFL, flags)  // restore blocking
+            fcntl(STDIN_FILENO, F_SETFL, flags)
 
             if n1 == 1, n2 == 1, a == 91 {
                 switch b {
@@ -78,7 +77,6 @@ final class RawTerminal {
         }
     }
 
-    // Write to stdout without a trailing newline and flush immediately
     func output(_ s: String) {
         Swift.print(s, terminator: "")
         fflush(stdout)

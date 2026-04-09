@@ -148,7 +148,7 @@ struct LinkItemListView: View {
     private func saveToYAML() async {
         // Convert all LinkItems to YAML format
         let linkConfigs = linkItems.map { item in
-            SettingsYaml.LinkConfig(
+            LinkConfig(
                 name: item.name,
                 from: item.from,
                 to: item.to,

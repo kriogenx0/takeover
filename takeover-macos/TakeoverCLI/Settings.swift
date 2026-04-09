@@ -1,13 +1,6 @@
 import Foundation
 import Yams
 
-struct LinkConfig: Codable {
-    var name: String
-    var from: String
-    var to: String
-    var defaults: String?
-}
-
 private struct SettingsFile: Codable {
     var links: [LinkConfig]
 }

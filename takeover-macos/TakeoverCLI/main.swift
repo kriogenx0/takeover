@@ -1,8 +1,21 @@
 import Darwin
 import Foundation
 
-// MARK: - Entry point
+let args = Array(CommandLine.arguments.dropFirst())
 
+// Non-interactive CLI mode when arguments are provided
+if !args.isEmpty {
+    do {
+        let links = try loadSettings()
+        CLI.run(args: args, links: links)
+    } catch {
+        print("Error: \(error.localizedDescription)")
+        exit(1)
+    }
+    exit(0)
+}
+
+// Interactive TUI mode (no arguments)
 let terminal = RawTerminal()
 
 // Restore terminal on Ctrl-C
