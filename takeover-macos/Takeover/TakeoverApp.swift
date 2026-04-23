@@ -15,6 +15,8 @@ struct TakeoverApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             LinkItem.self,
+            MacDefault.self,
+            AppInstaller.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -78,6 +80,7 @@ struct TakeoverApp: App {
     private func loadSettingsAndPopulate() async {
         do {
             let settings = try await settingsManager.loadSettings()
+            try await MacDefaultCatalog.shared.loadOrCreate()
             await syncSettingsToDatabase(settings: settings)
         } catch {
             print("Error loading settings: \(error)")
@@ -88,14 +91,11 @@ struct TakeoverApp: App {
     private func syncSettingsToDatabase(settings: SettingsYaml) async {
         let context = sharedModelContainer.mainContext
 
-        // Fetch existing items
+        // Sync LinkItems
         let descriptor = FetchDescriptor<LinkItem>()
         let existingItems = (try? context.fetch(descriptor)) ?? []
-
-        // Create a set of existing names for quick lookup
         let existingNames = Set(existingItems.map { $0.name })
 
-        // Add new items from YAML that don't exist in database
         for linkConfig in settings.links {
             if !existingNames.contains(linkConfig.name) {
                 let newItem = LinkItem(
@@ -105,6 +105,43 @@ struct TakeoverApp: App {
                     defaults: linkConfig.defaults ?? ""
                 )
                 context.insert(newItem)
+            }
+        }
+
+        // Sync MacDefaults: catalog is source of metadata, user settings supply values
+        let defaultsDescriptor = FetchDescriptor<MacDefault>()
+        let existingDefaults = (try? context.fetch(defaultsDescriptor)) ?? []
+        let existingDefaultNames = Set(existingDefaults.map { $0.name })
+
+        let userValues: [String: String] = Dictionary(
+            uniqueKeysWithValues: (settings.macDefaults ?? []).compactMap { config in
+                guard let v = config.value, !v.isEmpty else { return nil }
+                return (config.name, v)
+            }
+        )
+
+        for entry in MacDefaultCatalog.shared.entries {
+            if !existingDefaultNames.contains(entry.name) {
+                context.insert(MacDefault(
+                    name: entry.name,
+                    domain: entry.domain,
+                    key: entry.key,
+                    type: entry.type,
+                    value: userValues[entry.name] ?? "",
+                    hostFlag: entry.hostFlag ?? "",
+                    postCommand: entry.postCommand ?? ""
+                ))
+            }
+        }
+
+        // Sync AppInstallers
+        let installersDescriptor = FetchDescriptor<AppInstaller>()
+        let existingInstallers = (try? context.fetch(installersDescriptor)) ?? []
+        let existingInstallerNames = Set(existingInstallers.map { $0.name })
+
+        for config in settings.appInstallers ?? [] {
+            if !existingInstallerNames.contains(config.name) {
+                context.insert(AppInstaller(name: config.name, path: expandTilde(config.path)))
             }
         }
 

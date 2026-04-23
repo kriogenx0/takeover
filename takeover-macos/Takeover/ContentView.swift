@@ -10,12 +10,19 @@ import SwiftData
 
 struct ContentView: View {
     var body: some View {
-        LinkItemListView()
+        TabView {
+            LinkItemListView()
+                .tabItem { Label("Links", systemImage: "link") }
+            MacDefaultListView()
+                .tabItem { Label("Mac Defaults", systemImage: "gearshape") }
+            AppInstallerListView()
+                .tabItem { Label("Applications", systemImage: "app.badge.checkmark") }
+        }
     }
 }
 
 
 #Preview {
     ContentView()
-        .modelContainer(for: LinkItem.self, inMemory: true)
+        .modelContainer(for: [LinkItem.self, MacDefault.self, AppInstaller.self], inMemory: true)
 }

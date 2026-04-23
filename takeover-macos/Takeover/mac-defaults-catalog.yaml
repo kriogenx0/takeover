@@ -1,0 +1,281 @@
+- name: Dark Mode
+  domain: NSGlobalDomain
+  key: AppleInterfaceStyle
+  type: string
+  category: Global
+
+- name: Disable Spell Check
+  domain: "-g"
+  key: NSAutomaticSpellingCorrectionEnabled
+  type: bool
+  category: Global
+
+- name: Sheet Animation Speed
+  domain: NSGlobalDomain
+  key: NSWindowResizeTime
+  type: float
+  category: Global
+
+- name: Disable Press And Hold
+  domain: "-g"
+  key: ApplePressAndHoldEnabled
+  type: bool
+  category: Global
+
+- name: Show All File Extensions
+  domain: NSGlobalDomain
+  key: AppleShowAllExtensions
+  type: bool
+  post_command: killall Finder
+  category: Global
+
+- name: Crash Reporter Dialog
+  domain: com.apple.CrashReporter
+  key: DialogType
+  type: string
+  category: Global
+
+- name: Disable Quarantine
+  domain: com.apple.LaunchServices
+  key: LSQuarantine
+  type: bool
+  category: Global
+
+- name: Stage Manager Click
+  domain: com.apple.WindowManager
+  key: EnableStandardClickToShowDesktop
+  type: int
+  category: Global
+
+- name: Alert Volume
+  domain: "-g"
+  key: com.apple.sound.beep.volume
+  type: float
+  category: Sound
+
+- name: UI Sound Effects
+  domain: "-g"
+  key: com.apple.sound.uiaudio.enabled
+  type: int
+  category: Sound
+
+- name: Beep Flash
+  domain: "-g"
+  key: com.apple.sound.beep.flash
+  type: int
+  category: Sound
+
+- name: Key Repeat Initial
+  domain: NSGlobalDomain
+  key: InitialKeyRepeat
+  type: int
+  category: Keyboard
+
+- name: Key Repeat Rate
+  domain: NSGlobalDomain
+  key: KeyRepeat
+  type: int
+  category: Keyboard
+
+- name: Disable Mouse Shake
+  domain: NSGlobalDomain
+  key: CGDisableCursorLocationMagnification
+  type: bool
+  category: Mouse
+
+- name: Mouse Speed
+  domain: "-g"
+  key: com.apple.mouse.scaling
+  type: float
+  category: Mouse
+
+- name: Trackpad Speed
+  domain: "-g"
+  key: com.apple.trackpad.scaling
+  type: float
+  category: Trackpad
+
+- name: Trackpad Force Click
+  domain: "-g"
+  key: com.apple.trackpad.forceClick
+  type: int
+  category: Trackpad
+
+- name: Screenshot Location
+  domain: com.apple.screencapture
+  key: location
+  type: string
+  category: Screenshots
+
+- name: Finder Disable Animations
+  domain: com.apple.finder
+  key: DisableAllAnimations
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Extension Warning
+  domain: com.apple.finder
+  key: FXEnableExtensionChangeWarning
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Status Bar
+  domain: com.apple.finder
+  key: ShowStatusBar
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Show External Drives
+  domain: com.apple.finder
+  key: ShowExternalHardDrivesOnDesktop
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Show Hard Drives
+  domain: com.apple.finder
+  key: ShowHardDrivesOnDesktop
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Show Mounted Servers
+  domain: com.apple.finder
+  key: ShowMountedServersOnDesktop
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Show Removable Media
+  domain: com.apple.finder
+  key: ShowRemovableMediaOnDesktop
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Sidebar Width
+  domain: com.apple.finder
+  key: SidebarWidth
+  type: int
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Default View
+  domain: com.apple.finder
+  key: FXPreferredViewStyle
+  type: string
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Show Path Bar
+  domain: com.apple.finder
+  key: ShowPathbar
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Show Tab Bar
+  domain: com.apple.finder
+  key: ShowTabView
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Sort Folders First
+  domain: com.apple.finder
+  key: _FXSortFoldersFirst
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Default Search Scope
+  domain: com.apple.finder
+  key: FXDefaultSearchScope
+  type: string
+  post_command: killall Finder
+  category: Finder
+
+- name: Finder Show Hidden Files
+  domain: com.apple.finder
+  key: AppleShowAllFiles
+  type: bool
+  post_command: killall Finder
+  category: Finder
+
+- name: Dock Swoosh Animation
+  domain: com.apple.dock
+  key: workspaces-swoosh-animation-off
+  type: bool
+  post_command: killall Dock
+  category: Dock
+
+- name: Dock Orientation
+  domain: com.apple.dock
+  key: orientation
+  type: string
+  post_command: killall Dock
+  category: Dock
+
+- name: Dock Tile Size
+  domain: com.apple.dock
+  key: tilesize
+  type: integer
+  post_command: killall Dock
+  category: Dock
+
+- name: Dock Hide Delay
+  domain: com.apple.Dock
+  key: autohide-delay
+  type: float
+  post_command: killall Dock
+  category: Dock
+
+- name: Dock Show Recents
+  domain: com.apple.dock
+  key: show-recents
+  type: int
+  post_command: killall Dock
+  category: Dock
+
+- name: Dock Quick Note Corner
+  domain: com.apple.dock
+  key: wvous-corner-rclick
+  type: int
+  post_command: killall Dock
+  category: Dock
+
+- name: Menu Bar 24-Hour Clock
+  domain: com.apple.menuextra.clock
+  key: Show24Hour
+  type: int
+  post_command: killall SystemUIServer
+  category: Menu Bar
+
+- name: Safari Download Location
+  domain: com.apple.Safari.SandboxBroker
+  key: DownloadLocation
+  type: string
+  category: Safari
+
+- name: Safari Develop Menu
+  domain: com.apple.Safari.SandboxBroker
+  key: ShowDevelopMenu
+  type: int
+  category: Safari
+
+- name: Handoff Advertising
+  domain: com.apple.coreservices.useractivityd
+  key: ActivityAdvertisingAllowed
+  type: bool
+  host_flag: "-currentHost"
+  category: Handoff
+
+- name: Handoff Receiving
+  domain: com.apple.coreservices.useractivityd
+  key: ActivityReceivingAllowed
+  type: bool
+  host_flag: "-currentHost"
+  category: Handoff

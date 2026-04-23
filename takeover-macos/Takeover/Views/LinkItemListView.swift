@@ -26,6 +26,12 @@ struct LinkItemListView: View {
                     ForEach(linkItems, id: \.self) { linkItem in
                         Text(linkItem.name)
                             .tag(linkItem)
+                            .contextMenu {
+                                Button("Install") { onRun(linkItem: linkItem) }
+                                Button("Uninstall") { onUninstall(linkItem: linkItem) }
+                                Divider()
+                                Button("Delete", role: .destructive) { onDelete(linkItem: linkItem) }
+                            }
                     }
                     .onDelete(perform: deleteItems)
                 }

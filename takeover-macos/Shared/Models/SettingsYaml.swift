@@ -10,6 +10,14 @@ import Yams
 
 struct SettingsYaml: Codable {
     var links: [LinkConfig]
+    var macDefaults: [MacDefaultConfig]?
+    var appInstallers: [AppInstallerConfig]?
+
+    enum CodingKeys: String, CodingKey {
+        case links
+        case macDefaults = "mac_defaults"
+        case appInstallers = "app_installers"
+    }
 }
 
 class SettingsManager: ObservableObject {
