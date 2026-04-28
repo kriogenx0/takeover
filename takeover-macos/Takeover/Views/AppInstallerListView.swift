@@ -3,79 +3,26 @@ import SwiftData
 
 struct AppInstallerListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \AppInstaller.name) private var installers: [AppInstaller]
-    @State private var selection: AppInstaller? = nil
+    @Query private var installers: [AppInstaller]
 
     var body: some View {
-        NavigationSplitView {
+        Group {
+            if let installer = installers.first {
+                AppInstallerContentView(installer: installer, onSave: save)
+            } else {
+                Text("Loading…")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .onAppear {
             if installers.isEmpty {
-                Text("No App Sources")
-                    .foregroundColor(.secondary)
-            } else {
-                List(selection: $selection) {
-                    ForEach(installers, id: \.self) { item in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.name)
-                            Text(item.path)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                        .tag(item)
-                        .contextMenu {
-                            Button("Delete", role: .destructive) { deleteInstaller(item) }
-                        }
-                    }
-                    .onDelete { offsets in
-                        for i in offsets { deleteInstaller(installers[i]) }
-                    }
-                }
-                .listStyle(SidebarListStyle())
-                .navigationSplitViewColumnWidth(min: 180, ideal: 220)
-                .onAppear {
-                    if selection == nil { selection = installers.first }
-                }
-            }
-        } detail: {
-            if let item = selection {
-                AppInstallerDetailView(installer: item, onSave: onSave, onDelete: deleteInstaller)
-            } else {
-                Text("No Source Selected")
-                    .foregroundColor(.secondary)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .automatic) {
-                Button(action: addInstaller) {
-                    Label("Add", systemImage: "plus")
-                }
+                let item = AppInstaller(name: "Apps", path: "")
+                modelContext.insert(item)
             }
         }
     }
 
-    private func addInstaller() {
-        let item = AppInstaller(name: "New Source", path: "")
-        modelContext.insert(item)
-        selection = item
-        Task { await saveToYAML() }
-    }
-
-    private func deleteInstaller(_ item: AppInstaller) {
-        let index = installers.firstIndex(of: item)
-        let next: AppInstaller? = {
-            guard let i = index else { return nil }
-            if i < installers.count - 1 { return installers[i + 1] }
-            if i > 0 { return installers[i - 1] }
-            return nil
-        }()
-        withAnimation {
-            modelContext.delete(item)
-            if selection == item { selection = next }
-        }
-        Task { await saveToYAML() }
-    }
-
-    private func onSave(_ item: AppInstaller) {
+    private func save() {
         try? modelContext.save()
         Task { await saveToYAML() }
     }
@@ -89,70 +36,57 @@ struct AppInstallerListView: View {
     }
 }
 
-struct AppInstallerDetailView: View {
+struct AppInstallerContentView: View {
     @Bindable var installer: AppInstaller
-
-    var onSave: ((AppInstaller) -> Void)?
-    var onDelete: ((AppInstaller) -> Void)?
+    var onSave: (() -> Void)?
 
     @State private var discoveredApps: [DiscoveredApp] = []
     @State private var isScanning = false
-    @State private var installStatus: [String: (success: Bool, message: String)] = [:]
+    @State private var installStatus: [String: String] = [:]
+    @State private var installing: Set<String> = []
+    @State private var installedNames: [String: String] = [:]
+    @State private var installError: String? = nil
     @State private var saveTask: Task<Void, Never>?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Name")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    TextField("Source Name", text: $installer.name)
-                        .textFieldStyle(.roundedBorder)
-                }
-
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Folder Path")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        TextField("~/Downloads/Apps", text: $installer.path)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.system(.body, design: .monospaced))
-                    }
-                    Button("Browse") { browseForFolder() }
-                        .padding(.top, 20)
-                }
+            HStack(spacing: 8) {
+                TextField("~/Downloads/Apps", text: $installer.path)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.body, design: .monospaced))
+                Button("Browse") { browseForFolder() }
+                Button("Scan") { scanApps() }
+                    .disabled(installer.path.isEmpty)
+                if isScanning { ProgressView().scaleEffect(0.7) }
             }
-            .padding(24)
+            .padding(16)
 
             Divider()
 
-            HStack {
-                Text("Discovered Apps")
-                    .font(.headline)
-                Spacer()
-                if isScanning {
-                    ProgressView().scaleEffect(0.7)
-                }
-                Button("Scan") { scanApps() }
-                    .disabled(installer.path.isEmpty)
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
-
             if discoveredApps.isEmpty && !isScanning {
-                Text(installer.path.isEmpty ? "Set a folder path and tap Scan" : "No apps found — tap Scan to search")
+                Text(installer.path.isEmpty ? "Set a folder path and tap Scan" : "No apps found — tap Scan")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(discoveredApps) { app in
-                    AppRowView(app: app, status: installStatus[app.id]) {
-                        installApp(app)
-                    }
+                    let resolved = installedNames[app.id]
+                    AppRowView(
+                        app: app,
+                        status: installStatus[app.id],
+                        isInstalling: installing.contains(app.id),
+                        isInstalled: app.isInstalled(resolvedName: resolved),
+                        onInstall: { installApp(app) },
+                        onUninstall: { uninstallApp(app) },
+                        onOpen: {
+                            let name = resolved ?? app.name
+                            NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications/\(name).app"))
+                        }
+                    )
                     .contextMenu {
                         Button("Install") { installApp(app) }
-                            .disabled(app.isInstalled)
+                            .disabled(app.isInstalled(resolvedName: resolved) || installing.contains(app.id))
+                        Button("Uninstall", role: .destructive) { uninstallApp(app) }
+                            .disabled(!app.isInstalled(resolvedName: resolved))
                         Button("Reveal in Finder") {
                             NSWorkspace.shared.activateFileViewerSelecting([app.fileURL])
                         }
@@ -163,15 +97,20 @@ struct AppInstallerDetailView: View {
             Divider()
 
             HStack {
-                Button("Delete", role: .destructive) { onDelete?(installer) }
                 Spacer()
                 Button("Install All") { installAll() }
-                    .disabled(discoveredApps.filter { !$0.isInstalled }.isEmpty)
+                    .disabled(discoveredApps.filter { !$0.isInstalled(resolvedName: installedNames[$0.id]) }.isEmpty)
             }
-            .padding(24)
+            .padding(16)
         }
-        .frame(minWidth: 420)
-        .onChange(of: installer.name) { _, _ in scheduleSave() }
+        .alert("Installation Error", isPresented: Binding(
+            get: { installError != nil },
+            set: { if !$0 { installError = nil } }
+        )) {
+            Button("OK") { installError = nil }
+        } message: {
+            Text(installError ?? "")
+        }
         .onChange(of: installer.path) { _, _ in scheduleSave() }
         .onAppear { if !installer.path.isEmpty { scanApps() } }
     }
@@ -201,18 +140,43 @@ struct AppInstallerDetailView: View {
     }
 
     private func installApp(_ app: DiscoveredApp) {
+        installing.insert(app.id)
         Task {
             let result = AppInstallerEngine.install(app)
             await MainActor.run {
-                installStatus[app.id] = result
-                // Re-scan to refresh isInstalled state
+                installing.remove(app.id)
+                if result.success {
+                    installStatus[app.id] = result.message
+                    if let name = result.installedName {
+                        installedNames[app.id] = name
+                    }
+                } else {
+                    installError = result.message
+                }
+                discoveredApps = AppInstallerEngine.scan(at: installer.path)
+            }
+        }
+    }
+
+    private func uninstallApp(_ app: DiscoveredApp) {
+        installing.insert(app.id)
+        Task {
+            let result = AppInstallerEngine.uninstall(app, installedName: installedNames[app.id])
+            await MainActor.run {
+                installing.remove(app.id)
+                if result.success {
+                    installStatus[app.id] = result.message
+                    installedNames.removeValue(forKey: app.id)
+                } else {
+                    installError = result.message
+                }
                 discoveredApps = AppInstallerEngine.scan(at: installer.path)
             }
         }
     }
 
     private func installAll() {
-        let pending = discoveredApps.filter { !$0.isInstalled }
+        let pending = discoveredApps.filter { !$0.isInstalled(resolvedName: installedNames[$0.id]) }
         for app in pending { installApp(app) }
     }
 
@@ -220,15 +184,19 @@ struct AppInstallerDetailView: View {
         saveTask?.cancel()
         saveTask = Task {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-            if !Task.isCancelled { onSave?(installer) }
+            if !Task.isCancelled { onSave?() }
         }
     }
 }
 
 struct AppRowView: View {
     let app: DiscoveredApp
-    let status: (success: Bool, message: String)?
+    let status: String?
+    let isInstalling: Bool
+    let isInstalled: Bool
     let onInstall: () -> Void
+    let onUninstall: () -> Void
+    let onOpen: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
@@ -245,14 +213,19 @@ struct AppRowView: View {
 
             Spacer()
 
-            if let status = status {
-                Text(status.message)
-                    .font(.caption)
-                    .foregroundColor(status.success ? .green : .red)
-            } else if app.isInstalled {
-                Label("Installed", systemImage: "checkmark.circle.fill")
-                    .font(.caption)
-                    .foregroundColor(.green)
+            if isInstalling {
+                ProgressView()
+                    .scaleEffect(0.7)
+                    .frame(width: 60)
+            } else if status != nil {
+                Button("Open", action: onOpen)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+            } else if isInstalled {
+                Button("Uninstall", action: onUninstall)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .foregroundColor(.red)
             } else {
                 Button("Install", action: onInstall)
                     .buttonStyle(.borderedProminent)

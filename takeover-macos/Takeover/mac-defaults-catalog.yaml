@@ -77,7 +77,7 @@
   type: int
   category: Keyboard
 
-- name: Disable Mouse Shake
+- name: Shake Mouse Pointer to Locate
   domain: NSGlobalDomain
   key: CGDisableCursorLocationMagnification
   type: bool
@@ -279,3 +279,10 @@
   type: bool
   host_flag: "-currentHost"
   category: Handoff
+
+- name: iTerm Full Screen Style
+  domain: com.googlecode.iterm2
+  key: UseLionStyleFullscreen
+  type: bool
+  post_command: killall iTerm2
+  category: iTerm

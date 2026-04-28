@@ -12,32 +12,57 @@ struct MacDefaultListView: View {
                 Text("No Mac Defaults")
                     .foregroundColor(.secondary)
             } else {
+                let grouped = Dictionary(grouping: macDefaults, by: { displayDomain($0.domain) })
+                let domains = grouped.keys.sorted { a, b in a == "Global" ? true : b == "Global" ? false : a < b }
                 List(selection: $selection) {
-                    ForEach(macDefaults, id: \.self) { item in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.name)
-                            if !item.value.isEmpty {
-                                Text(item.value)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                    ForEach(domains, id: \.self) { domain in
+                        Section {
+                            ForEach(grouped[domain]!.sorted { $0.key < $1.key }, id: \.self) { item in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.name)
+                                            .fontWeight(.medium)
+                                        HStack {
+                                            Text(item.key)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                                .lineLimit(1)
+                                            if !item.value.isEmpty {
+                                                Spacer()
+                                                Text(item.value)
+                                                    .font(.caption)
+                                                    .foregroundColor(.accentColor)
+                                                    .lineLimit(1)
+                                            }
+                                        }
+                                    }
+                                }
+                                .tag(item)
+                                .contextMenu {
+                                    Button("Capture") {
+                                        MacDefaultInstaller.capture(macDefault: item)
+                                        try? modelContext.save()
+                                        Task { await saveToYAML() }
+                                    }
+                                    Button("Apply") {
+                                        MacDefaultInstaller.apply(macDefault: item)
+                                    }
+                                    .disabled(item.value.isEmpty)
+                                    Divider()
+                                    Button("Delete", role: .destructive) { onDelete(item) }
+                                }
                             }
-                        }
-                        .tag(item)
-                        .contextMenu {
-                            Button("Capture") {
-                                MacDefaultInstaller.capture(macDefault: item)
-                                try? modelContext.save()
-                                Task { await saveToYAML() }
-                            }
-                            Button("Apply") {
-                                MacDefaultInstaller.apply(macDefault: item)
-                            }
-                            .disabled(item.value.isEmpty)
-                            Divider()
-                            Button("Delete", role: .destructive) { onDelete(item) }
+                        } header: {
+                            Text(domain)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(Color(nsColor: .quaternaryLabelColor).opacity(0.3))
+                                .cornerRadius(4)
                         }
                     }
-                    .onDelete(perform: deleteItems)
                 }
                 .listStyle(SidebarListStyle())
                 .navigationSplitViewColumnWidth(min: 180, ideal: 200)
@@ -57,10 +82,10 @@ struct MacDefaultListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                Button(action: captureAll) {
-                    Label("Capture All", systemImage: "square.and.arrow.down")
+                Button(action: applyAll) {
+                    Label("Apply All", systemImage: "checkmark.circle")
                 }
-                .help("Read current values from system for all defaults")
+                .help("Apply all captured defaults to the system")
             }
             ToolbarItem(placement: .automatic) {
                 Button(action: addItem) {
@@ -70,23 +95,18 @@ struct MacDefaultListView: View {
         }
     }
 
-    private func captureAll() {
-        MacDefaultInstaller.captureAll(Array(macDefaults))
-        try? modelContext.save()
-        Task { await saveToYAML() }
+    private func displayDomain(_ domain: String) -> String {
+        (domain == "NSGlobalDomain" || domain == "-g") ? "Global" : domain
+    }
+
+    private func applyAll() {
+        MacDefaultInstaller.applyAll(Array(macDefaults))
     }
 
     private func addItem() {
         let newItem = MacDefault(name: "New Default")
         modelContext.insert(newItem)
         selection = newItem
-        Task { await saveToYAML() }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets { modelContext.delete(macDefaults[index]) }
-        }
         Task { await saveToYAML() }
     }
 
@@ -237,7 +257,7 @@ struct MacDefaultDetailView: View {
                 Text("Post Command (Optional)")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                TextField("killall Dock", text: $macDefault.postCommand)
+                TextField("", text: $macDefault.postCommand)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
             }
@@ -247,25 +267,31 @@ struct MacDefaultDetailView: View {
             Divider()
 
             HStack(spacing: 12) {
-                Button("Delete", role: .destructive) {
+                Button(role: .destructive) {
                     onDelete?(macDefault)
+                } label: {
+                    Label("Delete", systemImage: "trash")
                 }
 
                 Spacer()
 
-                Button("Capture") {
-                    let result = MacDefaultInstaller.capture(macDefault: macDefault)
-                    let notFound = result.isEmpty
-                        || result.contains("does not exist")
-                        || result.contains("The domain/defaults pair")
-                    captureStatus = notFound ? "Not found" : "Captured"
-                    captureIsSuccess = !notFound
-                    onSave?(macDefault)
-                }
+                Button {
+                                    let result = MacDefaultInstaller.capture(macDefault: macDefault)
+                                    let notFound = result.isEmpty
+                                        || result.contains("does not exist")
+                                        || result.contains("The domain/defaults pair")
+                                    captureStatus = notFound ? "Not found" : "Captured"
+                                    captureIsSuccess = !notFound
+                                    onSave?(macDefault)
+                                } label: {
+                                    Label("Capture", systemImage: "arrow.down.circle")
+                                }
                 .disabled(macDefault.domain.isEmpty || macDefault.key.isEmpty)
 
-                Button("Apply") {
+                Button {
                     MacDefaultInstaller.apply(macDefault: macDefault)
+                } label: {
+                    Label("Apply", systemImage: "play.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(macDefault.value.isEmpty)

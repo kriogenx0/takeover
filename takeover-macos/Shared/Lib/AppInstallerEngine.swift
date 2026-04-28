@@ -28,8 +28,9 @@ struct DiscoveredApp: Identifiable {
     var fileURL: URL
     var fileType: AppFileType
 
-    var isInstalled: Bool {
-        FileManager.default.fileExists(atPath: "/Applications/\(name).app")
+    func isInstalled(resolvedName: String? = nil) -> Bool {
+        let n = resolvedName ?? name
+        return FileManager.default.fileExists(atPath: "/Applications/\(n).app")
     }
 }
 
@@ -60,70 +61,110 @@ struct AppInstallerEngine {
             }
     }
 
-    static func install(_ app: DiscoveredApp) -> (success: Bool, message: String) {
+    // Returns (success, message, installedAppName) — installedAppName is the bundle name without .app
+    static func install(_ app: DiscoveredApp) -> (success: Bool, message: String, installedName: String?) {
         switch app.fileType {
-        case .zip: return installZip(app)
-        case .dmg: return installDmg(app)
-        case .app: return copyApp(from: app.fileURL)
-        case .pkg: return installPkg(app)
+        case .zip:
+            let r = installZip(app); return (r.0, r.1, r.2)
+        case .dmg:
+            let r = installDmg(app); return (r.0, r.1, r.2)
+        case .app:
+            let r = copyApp(from: app.fileURL)
+            return (r.0, r.1, r.0 ? r.2 : nil)
+        case .pkg:
+            let r = installPkg(app); return (r.0, r.1, nil)
         }
     }
 
-    private static func installZip(_ app: DiscoveredApp) -> (Bool, String) {
+    static func uninstall(_ app: DiscoveredApp, installedName: String? = nil) -> (success: Bool, message: String) {
+        let name = installedName ?? app.name
+        let appPath = "/Applications/\(name).app"
+        guard FileManager.default.fileExists(atPath: appPath) else {
+            return (false, "Not found in /Applications")
+        }
+        let script = "do shell script \"rm -rf \" & quoted form of \"\(appPath)\" with administrator privileges"
+        if let err = runAppleScript(script) { return (false, err) }
+        let success = !FileManager.default.fileExists(atPath: appPath)
+        return (success, success ? "Uninstalled \(name)" : "Uninstall failed")
+    }
+
+    // Writes AppleScript to a temp file and runs via osascript — thread-safe, no shell quoting issues.
+    // Returns nil on success, or an error string on failure.
+    private static func runAppleScript(_ script: String) -> String? {
+        let tmpURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("takeover-\(UUID().uuidString).applescript")
+        guard (try? script.write(to: tmpURL, atomically: true, encoding: .utf8)) != nil else {
+            return "Could not write script file"
+        }
+        defer { try? FileManager.default.removeItem(at: tmpURL) }
+        let output = Linker.shell("osascript '\(tmpURL.path)'")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return output.isEmpty ? nil : output
+    }
+
+    private static func installZip(_ app: DiscoveredApp) -> (Bool, String, String?) {
         let tempDir = FileManager.default.temporaryDirectory
             .appendingPathComponent("takeover-\(UUID().uuidString)")
 
-        let unzipResult = Linker.shell("ditto -xk '\(app.fileURL.path)' '\(tempDir.path)'")
-        guard !unzipResult.lowercased().contains("error") else {
-            return (false, "Unzip failed: \(unzipResult)")
+        let srcEsc = app.fileURL.path.replacingOccurrences(of: "'", with: "'\\''")
+        let dstEsc = tempDir.path.replacingOccurrences(of: "'", with: "'\\''")
+        let unzipResult = Linker.shell("ditto -xk '\(srcEsc)' '\(dstEsc)'")
+        if unzipResult.lowercased().contains("error") {
+            return (false, "Unzip failed: \(unzipResult)", nil)
         }
 
         guard let appURL = findApp(in: tempDir) else {
-            Linker.shell("rm -rf '\(tempDir.path)'")
-            return (false, "No .app found in zip")
+            Linker.shell("rm -rf '\(dstEsc)'")
+            return (false, "No .app found in zip", nil)
         }
 
-        let result = copyApp(from: appURL)
-        Linker.shell("rm -rf '\(tempDir.path)'")
-        return result
+        let appName = appURL.deletingPathExtension().lastPathComponent
+        let destPath = "/Applications/\(appName).app"
+
+        if FileManager.default.fileExists(atPath: destPath) {
+            Linker.shell("rm -rf '\(dstEsc)'")
+            return (false, "\(appName) is already installed", appName)
+        }
+
+        let r = copyApp(from: appURL)
+        Linker.shell("rm -rf '\(dstEsc)'")
+        return (r.0, r.1, appName)
     }
 
-    private static func installDmg(_ app: DiscoveredApp) -> (Bool, String) {
-        let attachOutput = Linker.shell("hdiutil attach '\(app.fileURL.path)' -nobrowse -quiet -plist")
+    private static func installDmg(_ app: DiscoveredApp) -> (Bool, String, String?) {
+        let escapedPath = app.fileURL.path.replacingOccurrences(of: "'", with: "'\\''")
+        let attachOutput = Linker.shell("hdiutil attach '\(escapedPath)' -nobrowse -noverify -accepteula -plist")
 
-        let mountPoint = parseMountPoint(from: attachOutput)
-        guard let mountPath = mountPoint else {
-            return (false, "Could not mount DMG")
+        guard let mountPath = parseMountPoint(from: attachOutput) else {
+            return (false, "Could not mount DMG: \(attachOutput.prefix(120))", nil)
         }
 
         let mountURL = URL(fileURLWithPath: mountPath)
         guard let appURL = findApp(in: mountURL) else {
             Linker.shell("hdiutil detach '\(mountPath)' -quiet")
-            return (false, "No .app found in DMG")
+            return (false, "No .app found in DMG", nil)
         }
 
-        let result = copyApp(from: appURL)
+        let r = copyApp(from: appURL)
         Linker.shell("hdiutil detach '\(mountPath)' -quiet")
-        return result
+        return (r.0, r.1, r.0 ? r.2 : nil)
     }
 
     private static func installPkg(_ app: DiscoveredApp) -> (Bool, String) {
-        let escapedPath = app.fileURL.path.replacingOccurrences(of: "\"", with: "\\\"")
-        let script = "do shell script \"installer -pkg '\\\"'\(escapedPath)'\\\"' -target /\" with administrator privileges"
-        let output = Linker.shell("osascript -e '\(script)'")
-        let failed = output.lowercased().contains("failed") || output.lowercased().contains("error")
-        return (!failed, failed ? "Install failed: \(output.trimmingCharacters(in: .whitespacesAndNewlines))" : "Installed \(app.name)")
+        let script = "do shell script \"installer -pkg \" & quoted form of \"\(app.fileURL.path)\" & \" -target /\" with administrator privileges"
+        if let err = runAppleScript(script) { return (false, "Install failed: \(err)") }
+        return (true, "Installed \(app.name)")
     }
 
-    private static func copyApp(from appURL: URL) -> (Bool, String) {
-        let appName = appURL.lastPathComponent
-        let destPath = "/Applications/\(appName)"
-        let escapedSrc = appURL.path.replacingOccurrences(of: "\"", with: "\\\"")
-        let escapedDst = destPath.replacingOccurrences(of: "\"", with: "\\\"")
-        let script = "do shell script \"ditto '\\\"'\(escapedSrc)'\\\"' '\\\"'\(escapedDst)'\\\"'\" with administrator privileges"
-        Linker.shell("osascript -e '\(script)'")
+    // Returns (success, message, bundleNameWithoutDotApp)
+    private static func copyApp(from appURL: URL) -> (Bool, String, String) {
+        let appBundle = appURL.lastPathComponent
+        let appName = appURL.deletingPathExtension().lastPathComponent
+        let destPath = "/Applications/\(appBundle)"
+        let script = "do shell script \"ditto \" & quoted form of \"\(appURL.path)\" & \" \" & quoted form of \"\(destPath)\" with administrator privileges"
+        if let err = runAppleScript(script) { return (false, err, appName) }
         let success = FileManager.default.fileExists(atPath: destPath)
-        return (success, success ? "Installed \(appName)" : "Installation failed")
+        return (success, success ? "Installed \(appName)" : "Installation failed", appName)
     }
 
     private static func findApp(in directory: URL) -> URL? {
@@ -145,12 +186,10 @@ struct AppInstallerEngine {
         return nil
     }
 
-    // Parse the mount point from hdiutil -plist output
     private static func parseMountPoint(from output: String) -> String? {
         guard let data = output.data(using: .utf8),
               let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
               let entities = plist["system-entities"] as? [[String: Any]] else {
-            // Fallback: parse tab-delimited output
             return output.components(separatedBy: "\n").compactMap { line -> String? in
                 let parts = line.components(separatedBy: "\t")
                 let point = parts.last?.trimmingCharacters(in: .whitespaces) ?? ""
