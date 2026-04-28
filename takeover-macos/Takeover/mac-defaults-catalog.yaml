@@ -266,6 +266,42 @@
   type: int
   category: Safari
 
+- name: Safari Always Show Tab Bar
+  domain: com.apple.Safari
+  key: AlwaysShowTabBar
+  type: bool
+  category: Safari
+
+- name: Safari Open Links in New Tab
+  domain: com.apple.Safari
+  key: TabCreationPolicy
+  type: int
+  category: Safari
+
+- name: Safari New Tab Shows
+  domain: com.apple.Safari
+  key: NewTabBehavior
+  type: int
+  category: Safari
+
+- name: Safari New Window Shows
+  domain: com.apple.Safari
+  key: NewWindowBehavior
+  type: int
+  category: Safari
+
+- name: Safari Open New Tabs in Background
+  domain: com.apple.Safari
+  key: OpenNewTabsInFront
+  type: bool
+  category: Safari
+
+- name: Safari Cmd-Click Opens Tab
+  domain: com.apple.Safari
+  key: TargetedClicksCreateTabs
+  type: bool
+  category: Safari
+
 - name: Handoff Advertising
   domain: com.apple.coreservices.useractivityd
   key: ActivityAdvertisingAllowed
