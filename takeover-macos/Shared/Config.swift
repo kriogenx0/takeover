@@ -1,7 +1,7 @@
 import Foundation
 
 struct Config {
-    static let backupPath = "~/Library/Application Support/Takeover"
+    static let backupPath = "~/Library/Mobile Documents/com~apple~CloudDocs/Takeover"
 
     static var expandedBackupPath: String {
         PathUtility.expandTildeToRealHome(backupPath)
