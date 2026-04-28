@@ -133,7 +133,7 @@ struct AppInstallerEngine {
 
     private static func installDmg(_ app: DiscoveredApp) -> (Bool, String, String?) {
         let escapedPath = app.fileURL.path.replacingOccurrences(of: "'", with: "'\\''")
-        let attachOutput = Linker.shell("hdiutil attach '\(escapedPath)' -nobrowse -noverify -accepteula -plist")
+        let attachOutput = Linker.shell("hdiutil attach '\(escapedPath)' -nobrowse -noverify -plist")
 
         guard let mountPath = parseMountPoint(from: attachOutput) else {
             return (false, "Could not mount DMG: \(attachOutput.prefix(120))", nil)
@@ -145,9 +145,10 @@ struct AppInstallerEngine {
             return (false, "No .app found in DMG", nil)
         }
 
+        let appName = appURL.deletingPathExtension().lastPathComponent
         let r = copyApp(from: appURL)
         Linker.shell("hdiutil detach '\(mountPath)' -quiet")
-        return (r.0, r.1, r.0 ? r.2 : nil)
+        return (r.0, r.1, appName)
     }
 
     private static func installPkg(_ app: DiscoveredApp) -> (Bool, String) {

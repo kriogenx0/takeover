@@ -286,3 +286,9 @@
   type: bool
   post_command: killall iTerm2
   category: iTerm
+
+- name: iTerm Pane Dimming Amount
+  domain: com.googlecode.iterm2
+  key: SplitPaneDimmingAmount
+  type: float
+  category: iTerm

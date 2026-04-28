@@ -147,11 +147,11 @@ struct AppInstallerContentView: View {
                 installing.remove(app.id)
                 if result.success {
                     installStatus[app.id] = result.message
-                    if let name = result.installedName {
-                        installedNames[app.id] = name
-                    }
                 } else {
                     installError = result.message
+                }
+                if let name = result.installedName {
+                    installedNames[app.id] = name
                 }
                 discoveredApps = AppInstallerEngine.scan(at: installer.path)
             }
