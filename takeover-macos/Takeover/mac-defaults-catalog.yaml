@@ -89,6 +89,18 @@
   type: float
   category: Mouse
 
+- name: Mouse Right Click Mode
+  domain: com.apple.AppleMultitouchMouse
+  key: MouseButtonMode
+  type: string
+  category: Mouse
+
+- name: Mouse Right Click Division
+  domain: com.apple.AppleMultitouchMouse
+  key: MouseButtonDivision
+  type: int
+  category: Mouse
+
 - name: Trackpad Speed
   domain: "-g"
   key: com.apple.trackpad.scaling
@@ -242,7 +254,7 @@
 
 - name: Dock Quick Note Corner
   domain: com.apple.dock
-  key: wvous-corner-rclick
+  key: wvous-br-corner
   type: int
   post_command: killall Dock
   category: Dock
