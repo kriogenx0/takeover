@@ -5,82 +5,96 @@ struct MacDefaultListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MacDefault.name) private var macDefaults: [MacDefault]
     @State private var selection: MacDefault? = nil
+    @State private var sidebarVisible = true
 
     var body: some View {
-        NavigationSplitView {
-            if macDefaults.isEmpty {
-                Text("No Mac Defaults")
-                    .foregroundColor(.secondary)
-            } else {
-                let grouped = Dictionary(grouping: macDefaults, by: { displayDomain($0.domain) })
-                let domains = grouped.keys.sorted { a, b in a == "Global" ? true : b == "Global" ? false : a < b }
-                List(selection: $selection) {
-                    ForEach(domains, id: \.self) { domain in
-                        Section {
-                            ForEach(grouped[domain]!.sorted { $0.key < $1.key }, id: \.self) { item in
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(item.name)
-                                            .fontWeight(.medium)
+        HSplitView {
+            if sidebarVisible {
+                Group {
+                    if macDefaults.isEmpty {
+                        Text("No Mac Defaults")
+                            .foregroundColor(.secondary)
+                    } else {
+                        let grouped = Dictionary(grouping: macDefaults, by: { displayDomain($0.domain) })
+                        let domains = grouped.keys.sorted { a, b in a == "Global" ? true : b == "Global" ? false : a < b }
+                        List(selection: $selection) {
+                            ForEach(domains, id: \.self) { domain in
+                                Section {
+                                    ForEach(grouped[domain]!.sorted { $0.key < $1.key }, id: \.self) { item in
                                         HStack {
-                                            Text(item.key)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                                .lineLimit(1)
-                                            if !item.value.isEmpty {
-                                                Spacer()
-                                                Text(item.value)
-                                                    .font(.caption)
-                                                    .foregroundColor(.accentColor)
-                                                    .lineLimit(1)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(item.name)
+                                                    .fontWeight(.medium)
+                                                HStack {
+                                                    Text(item.key)
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                        .lineLimit(1)
+                                                    if !item.value.isEmpty {
+                                                        Spacer()
+                                                        Text(item.value)
+                                                            .font(.caption)
+                                                            .foregroundColor(.accentColor)
+                                                            .lineLimit(1)
+                                                    }
+                                                }
                                             }
                                         }
+                                        .tag(item)
+                                        .contextMenu {
+                                            Button("Capture") {
+                                                MacDefaultInstaller.capture(macDefault: item)
+                                                try? modelContext.save()
+                                                Task { await saveToYAML() }
+                                            }
+                                            Button("Apply") {
+                                                MacDefaultInstaller.apply(macDefault: item)
+                                            }
+                                            .disabled(item.value.isEmpty)
+                                            Divider()
+                                            Button("Delete", role: .destructive) { onDelete(item) }
+                                        }
                                     }
-                                }
-                                .tag(item)
-                                .contextMenu {
-                                    Button("Capture") {
-                                        MacDefaultInstaller.capture(macDefault: item)
-                                        try? modelContext.save()
-                                        Task { await saveToYAML() }
-                                    }
-                                    Button("Apply") {
-                                        MacDefaultInstaller.apply(macDefault: item)
-                                    }
-                                    .disabled(item.value.isEmpty)
-                                    Divider()
-                                    Button("Delete", role: .destructive) { onDelete(item) }
+                                } header: {
+                                    Text(domain)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.secondary)
+                                        .padding(.vertical, 4)
+                                        .padding(.horizontal, 8)
+                                        .background(Color(nsColor: .quaternaryLabelColor).opacity(0.3))
+                                        .cornerRadius(4)
                                 }
                             }
-                        } header: {
-                            Text(domain)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background(Color(nsColor: .quaternaryLabelColor).opacity(0.3))
-                                .cornerRadius(4)
+                        }
+                        .listStyle(.sidebar)
+                        .onAppear {
+                            if selection == nil && !macDefaults.isEmpty {
+                                selection = macDefaults.first
+                            }
                         }
                     }
                 }
-                .listStyle(SidebarListStyle())
-                .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-                .onAppear {
-                    if selection == nil && !macDefaults.isEmpty {
-                        selection = macDefaults.first
-                    }
+                .frame(minWidth: 180, idealWidth: 200)
+            }
+
+            Group {
+                if let item = selection {
+                    MacDefaultDetailView(macDefault: item, onSave: onSave, onDelete: onDelete)
+                } else {
+                    Text("No Default Selected")
+                        .foregroundColor(.secondary)
                 }
             }
-        } detail: {
-            if let item = selection {
-                MacDefaultDetailView(macDefault: item, onSave: onSave, onDelete: onDelete)
-            } else {
-                Text("No Default Selected")
-                    .foregroundColor(.secondary)
-            }
+            .frame(maxWidth: .infinity)
         }
+        .toolbar(removing: .sidebarToggle)
         .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button(action: { withAnimation { sidebarVisible.toggle() } }) {
+                    Label("Toggle Sidebar", systemImage: "sidebar.left")
+                }
+            }
             ToolbarItem(placement: .automatic) {
                 Button(action: applyAll) {
                     Label("Apply All", systemImage: "checkmark.circle")

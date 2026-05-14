@@ -25,6 +25,8 @@ install:
 	xcodebuild -project Takeover.xcodeproj -scheme Takeover -configuration Release \
 		-derivedDataPath $(BUILD_DIR) build
 	@echo "Installing to /Applications..."
+	-killall Takeover 2>/dev/null; true
+	rm -rf "/Applications/$(APP_NAME)"
 	cp -R "$(BUILD_DIR)/Build/Products/Release/$(APP_NAME)" /Applications/
 	@echo "$(APP_NAME) installed successfully!"
 

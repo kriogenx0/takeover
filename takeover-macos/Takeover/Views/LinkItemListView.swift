@@ -18,48 +18,61 @@ struct LinkItemListView: View {
 //    @Binding var linkItems: [LinkItem]
     @State private var linkItemSelection: LinkItem? = nil
     @State private var showRecipesView = false
+    @State private var sidebarVisible = true
 
     var body: some View {
-        NavigationSplitView {
-            if linkItems.count > 0 {
-                List(selection: $linkItemSelection) {
-                    ForEach(linkItems, id: \.self) { linkItem in
-                        Text(linkItem.name)
-                            .tag(linkItem)
-                            .contextMenu {
-                                Button("Install") { onRun(linkItem: linkItem) }
-                                Button("Uninstall") { onUninstall(linkItem: linkItem) }
-                                Divider()
-                                Button("Delete", role: .destructive) { onDelete(linkItem: linkItem) }
+        HSplitView {
+            if sidebarVisible {
+                Group {
+                    if linkItems.count > 0 {
+                        List(selection: $linkItemSelection) {
+                            ForEach(linkItems, id: \.self) { linkItem in
+                                Text(linkItem.name)
+                                    .tag(linkItem)
+                                    .contextMenu {
+                                        Button("Install") { onRun(linkItem: linkItem) }
+                                        Button("Uninstall") { onUninstall(linkItem: linkItem) }
+                                        Divider()
+                                        Button("Delete", role: .destructive) { onDelete(linkItem: linkItem) }
+                                    }
                             }
+                            .onDelete(perform: deleteItems)
+                        }
+                        .listStyle(.sidebar)
+                        .onAppear {
+                            if linkItemSelection == nil && !linkItems.isEmpty {
+                                linkItemSelection = linkItems.first
+                            }
+                        }
+                    } else {
+                        Text("No Link Items")
                     }
-                    .onDelete(perform: deleteItems)
                 }
-                .listStyle(SidebarListStyle())
-                .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-                .onAppear {
-                    // Auto-select first item if nothing is selected and items exist
-                    if linkItemSelection == nil && !linkItems.isEmpty {
-                        linkItemSelection = linkItems.first
-                    }
+                .frame(minWidth: 180, idealWidth: 200)
+            }
+
+            Group {
+                if let selectedItem = linkItemSelection {
+                    LinkItemDetailView(
+                        linkItem: selectedItem,
+                        onSave: onSave,
+                        onRun: onRun,
+                        onDelete: onDelete,
+                        onUninstall: onUninstall
+                    )
+                } else {
+                    Text("No Link Items")
+                        .foregroundColor(.secondary)
                 }
-            } else {
-                Text("No Link Items")
             }
-        } detail: {
-            if let selectedItem = linkItemSelection {
-                LinkItemDetailView(
-                    linkItem: selectedItem,
-                    onSave: onSave,
-                    onRun: onRun,
-                    onDelete: onDelete,
-                    onUninstall: onUninstall
-                )
-            } else {
-                Text("No Link Items")
-                    .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity)
+        }
+        .toolbar(content: {
+            ToolbarItem(placement: .navigation) {
+                Button(action: { withAnimation { sidebarVisible.toggle() } }) {
+                    Label("Toggle Sidebar", systemImage: "sidebar.left")
+                }
             }
-        }.toolbar(content: {
             ToolbarItem(placement: .automatic) {
                 Button(action: { showRecipesView = true }) {
                     Label("Browse Recipes", systemImage: "books.vertical")

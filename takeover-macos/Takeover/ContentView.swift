@@ -18,6 +18,7 @@ struct ContentView: View {
             AppInstallerListView()
                 .tabItem { Label("Applications", systemImage: "app.badge.checkmark") }
         }
+        .toolbarBackground(.visible, for: .windowToolbar)
     }
 }
 
