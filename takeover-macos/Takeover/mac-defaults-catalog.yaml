@@ -272,6 +272,12 @@
   type: string
   category: Safari
 
+- name: Safari Open Safe Files
+  domain: com.apple.Safari
+  key: AutoOpenSafeDownloads
+  type: bool
+  category: Safari
+
 - name: Safari Develop Menu
   domain: com.apple.Safari.SandboxBroker
   key: ShowDevelopMenu
