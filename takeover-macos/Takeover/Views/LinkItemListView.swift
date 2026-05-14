@@ -21,34 +21,29 @@ struct LinkItemListView: View {
     @State private var sidebarVisible = true
 
     var body: some View {
-        HSplitView {
-            if sidebarVisible {
-                Group {
-                    if linkItems.count > 0 {
-                        List(selection: $linkItemSelection) {
-                            ForEach(linkItems, id: \.self) { linkItem in
-                                Text(linkItem.name)
-                                    .tag(linkItem)
-                                    .contextMenu {
-                                        Button("Install") { onRun(linkItem: linkItem) }
-                                        Button("Uninstall") { onUninstall(linkItem: linkItem) }
-                                        Divider()
-                                        Button("Delete", role: .destructive) { onDelete(linkItem: linkItem) }
-                                    }
+        HStack(spacing: 0) {
+            if sidebarVisible && !linkItems.isEmpty {
+                List(selection: $linkItemSelection) {
+                    ForEach(linkItems, id: \.self) { linkItem in
+                        Text(linkItem.name)
+                            .tag(linkItem)
+                            .contextMenu {
+                                Button("Install") { onRun(linkItem: linkItem) }
+                                Button("Uninstall") { onUninstall(linkItem: linkItem) }
+                                Divider()
+                                Button("Delete", role: .destructive) { onDelete(linkItem: linkItem) }
                             }
-                            .onDelete(perform: deleteItems)
-                        }
-                        .listStyle(.sidebar)
-                        .onAppear {
-                            if linkItemSelection == nil && !linkItems.isEmpty {
-                                linkItemSelection = linkItems.first
-                            }
-                        }
-                    } else {
-                        Text("No Link Items")
+                    }
+                    .onDelete(perform: deleteItems)
+                }
+                .listStyle(.sidebar)
+                .onAppear {
+                    if linkItemSelection == nil && !linkItems.isEmpty {
+                        linkItemSelection = linkItems.first
                     }
                 }
-                .frame(minWidth: 180, idealWidth: 200)
+                .frame(minWidth: 180, idealWidth: 200, maxWidth: 300)
+                Divider()
             }
 
             Group {

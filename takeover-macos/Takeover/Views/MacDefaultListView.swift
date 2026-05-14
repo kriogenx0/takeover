@@ -8,7 +8,7 @@ struct MacDefaultListView: View {
     @State private var sidebarVisible = true
 
     var body: some View {
-        HSplitView {
+        HStack(spacing: 0) {
             if sidebarVisible {
                 Group {
                     if macDefaults.isEmpty {
@@ -75,7 +75,8 @@ struct MacDefaultListView: View {
                         }
                     }
                 }
-                .frame(minWidth: 180, idealWidth: 200)
+                .frame(minWidth: 180, idealWidth: 200, maxWidth: 300)
+                Divider()
             }
 
             Group {
