@@ -165,6 +165,7 @@ struct MacDefaultDetailView: View {
     @State private var captureStatus: String? = nil
     @State private var captureIsSuccess = false
     @State private var saveTask: Task<Void, Never>?
+    @State private var systemValue: String? = nil
 
     let typeOptions = ["string", "int", "integer", "float", "bool"]
 
@@ -241,6 +242,30 @@ struct MacDefaultDetailView: View {
                     TextField("captured value", text: $macDefault.value)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.body, design: .monospaced))
+                }
+
+                if !macDefault.domain.isEmpty && !macDefault.key.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("System Value")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button(action: refreshSystemValue) {
+                                Label("Refresh", systemImage: "arrow.clockwise")
+                                    .labelStyle(.iconOnly)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Read the current system value without changing the stored value")
+                        }
+                        Text(systemValue.map { $0.isEmpty ? "Not set" : $0 } ?? "Unknown")
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .padding(8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .cornerRadius(6)
+                    }
                 }
             }
 
@@ -321,6 +346,8 @@ struct MacDefaultDetailView: View {
         .onChange(of: macDefault.value)       { _, _ in scheduleSave() }
         .onChange(of: macDefault.hostFlag)    { _, _ in scheduleSave() }
         .onChange(of: macDefault.postCommand) { _, _ in scheduleSave() }
+        .onChange(of: macDefault.id)          { _, _ in refreshSystemValue() }
+        .onAppear { refreshSystemValue() }
     }
 
     private func scheduleSave() {
@@ -329,5 +356,13 @@ struct MacDefaultDetailView: View {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             if !Task.isCancelled { onSave?(macDefault) }
         }
+    }
+
+    private func refreshSystemValue() {
+        guard !macDefault.domain.isEmpty, !macDefault.key.isEmpty else {
+            systemValue = nil
+            return
+        }
+        systemValue = MacDefaultInstaller.peekSystemValue(macDefault: macDefault)
     }
 }
