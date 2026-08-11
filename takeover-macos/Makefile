@@ -1,9 +1,17 @@
 BUILD_DIR := build
 APP_NAME := Takeover.app
 
-.DEFAULT_GOAL := install
+.DEFAULT_GOAL := dev
 
-.PHONY: test install install-open
+.PHONY: test install install-open dev
+
+dev:
+	@echo "Building $(APP_NAME) (Debug)..."
+	xcodebuild -project Takeover.xcodeproj -scheme Takeover -configuration Debug \
+		-derivedDataPath $(BUILD_DIR) build
+	@echo "Launching $(APP_NAME)..."
+	-killall Takeover 2>/dev/null; true
+	open "$(BUILD_DIR)/Build/Products/Debug/$(APP_NAME)"
 
 test:
 	@echo "Running unit tests for TakeoverCLI..."
