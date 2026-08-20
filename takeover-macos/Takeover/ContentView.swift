@@ -12,11 +12,11 @@ struct ContentView: View {
     var body: some View {
         TabView {
             LinkItemListView()
-                .tabItem { Label("Links", systemImage: "link") }
+                .tabItem { Label("Sync App Settings", systemImage: "link") }
             MacDefaultListView()
-                .tabItem { Label("Mac Defaults", systemImage: "gearshape") }
+                .tabItem { Label("macOS Tweaks", systemImage: "gearshape") }
             AppInstallerListView()
-                .tabItem { Label("Applications", systemImage: "app.badge.checkmark") }
+                .tabItem { Label("Install Apps", systemImage: "app.badge.checkmark") }
         }
         .toolbarBackground(.visible, for: .windowToolbar)
     }
