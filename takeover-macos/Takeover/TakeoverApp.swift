@@ -120,6 +120,13 @@ struct TakeoverApp: App {
             }
         )
 
+        let userOSVersions: [String: Int] = Dictionary(
+            uniqueKeysWithValues: (settings.macDefaults ?? []).compactMap { config in
+                guard let v = config.capturedOSMajorVersion else { return nil }
+                return (config.name, v)
+            }
+        )
+
         for entry in MacDefaultCatalog.shared.entries {
             if !existingDefaultNames.contains(entry.name) {
                 context.insert(MacDefault(
@@ -129,7 +136,8 @@ struct TakeoverApp: App {
                     type: entry.type,
                     value: userValues[entry.name] ?? "",
                     hostFlag: entry.hostFlag ?? "",
-                    postCommand: entry.postCommand ?? ""
+                    postCommand: entry.postCommand ?? "",
+                    capturedOSMajorVersion: userOSVersions[entry.name] ?? 0
                 ))
             }
         }

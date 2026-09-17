@@ -10,6 +10,12 @@ struct LinkConfig: Codable {
 struct MacDefaultConfig: Codable {
     var name: String
     var value: String?
+    var capturedOSMajorVersion: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case name, value
+        case capturedOSMajorVersion = "captured_os_major_version"
+    }
 }
 
 struct AppInstallerConfig: Codable {

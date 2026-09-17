@@ -19,6 +19,13 @@ struct ContentView: View {
                 .tabItem { Label("Install Apps", systemImage: "app.badge.checkmark") }
         }
         .toolbarBackground(.visible, for: .windowToolbar)
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                Text("macOS \(SystemInfo.macOSVersionString)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
     }
 }
 

@@ -149,7 +149,7 @@ struct MacDefaultListView: View {
     private func saveToYAML() async {
         let configs = macDefaults
             .filter { !$0.value.isEmpty }
-            .map { MacDefaultConfig(name: $0.name, value: $0.value) }
+            .map { MacDefaultConfig(name: $0.name, value: $0.value, capturedOSMajorVersion: $0.capturedOSMajorVersion == 0 ? nil : $0.capturedOSMajorVersion) }
         guard var settings = SettingsManager.shared.settings else { return }
         settings.macDefaults = configs
         try? await SettingsManager.shared.saveSettings(settings)
@@ -265,6 +265,19 @@ struct MacDefaultDetailView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(Color(nsColor: .controlBackgroundColor))
                             .cornerRadius(6)
+                    }
+                }
+
+                if macDefault.capturedOSMajorVersion != 0 {
+                    HStack(spacing: 4) {
+                        Text("Captured on macOS \(macDefault.capturedOSMajorVersion)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if macDefault.capturedOSMajorVersion != SystemInfo.macOSMajorVersion {
+                            Label("Running macOS \(SystemInfo.macOSMajorVersion)", systemImage: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
             }

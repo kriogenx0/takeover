@@ -16,7 +16,10 @@ struct MacDefaultInstaller {
     @MainActor
     static func capture(macDefault: MacDefault) -> String {
         let result = readSystemValue(macDefault: macDefault)
-        if !result.isEmpty { macDefault.value = result }
+        if !result.isEmpty {
+            macDefault.value = result
+            macDefault.capturedOSMajorVersion = SystemInfo.macOSMajorVersion
+        }
         return result
     }
 

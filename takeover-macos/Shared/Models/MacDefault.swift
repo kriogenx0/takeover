@@ -10,8 +10,9 @@ class MacDefault: ObservableObject, Identifiable {
     var value: String
     var hostFlag: String
     var postCommand: String
+    var capturedOSMajorVersion: Int = 0
 
-    init(name: String, domain: String = "", key: String = "", type: String = "string", value: String = "", hostFlag: String = "", postCommand: String = "") {
+    init(name: String, domain: String = "", key: String = "", type: String = "string", value: String = "", hostFlag: String = "", postCommand: String = "", capturedOSMajorVersion: Int = 0) {
         self.name = name
         self.domain = domain
         self.key = key
@@ -19,6 +20,7 @@ class MacDefault: ObservableObject, Identifiable {
         self.value = value
         self.hostFlag = hostFlag
         self.postCommand = postCommand
+        self.capturedOSMajorVersion = capturedOSMajorVersion
     }
 
     var readCommand: String {
