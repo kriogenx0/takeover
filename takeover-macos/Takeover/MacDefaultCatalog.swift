@@ -9,11 +9,23 @@ struct MacDefaultCatalogEntry: Codable {
     let hostFlag: String?
     let postCommand: String?
     let category: String?
+    /// Inclusive macOS major-version range this default applies to; nil means
+    /// no bound.
+    let minMacOS: Int?
+    let maxMacOS: Int?
 
     enum CodingKeys: String, CodingKey {
         case name, domain, key, type, category
         case hostFlag = "host_flag"
         case postCommand = "post_command"
+        case minMacOS = "min_macos"
+        case maxMacOS = "max_macos"
+    }
+
+    func supports(macOSMajorVersion version: Int) -> Bool {
+        if let minMacOS, version < minMacOS { return false }
+        if let maxMacOS, version > maxMacOS { return false }
+        return true
     }
 }
 
@@ -23,30 +35,16 @@ class MacDefaultCatalog {
 
     private init() {}
 
-    var catalogFileURL: URL {
-        SettingsManager.shared.settingsFileURL
-            .deletingLastPathComponent()
-            .appendingPathComponent("mac-defaults-catalog.yaml")
+    /// Loads the available defaults from takeover-api (cached, with the bundled
+    /// catalog as the offline fallback), keeping only those for this macOS.
+    func load() async throws {
+        let all = try await RemoteCatalog.load(
+            [MacDefaultCatalogEntry].self,
+            sources: [RemoteCatalog.catalogURL("mac-defaults.yaml")],
+            cacheName: "mac-defaults-catalog",
+            bundled: Bundle.main.url(forResource: "mac-defaults-catalog", withExtension: "yaml")
+        )
+        let version = SystemInfo.macOSMajorVersion
+        entries = all.filter { $0.supports(macOSMajorVersion: version) }
     }
-
-    func loadOrCreate() async throws {
-        let url = catalogFileURL
-        if !FileManager.default.fileExists(atPath: url.path) {
-            try copyBundledCatalog(to: url)
-        }
-        let data = try Data(contentsOf: url)
-        let yaml = String(data: data, encoding: .utf8) ?? ""
-        entries = try YAMLDecoder().decode([MacDefaultCatalogEntry].self, from: yaml)
-    }
-
-    private func copyBundledCatalog(to url: URL) throws {
-        guard let bundleURL = Bundle.main.url(forResource: "mac-defaults-catalog", withExtension: "yaml") else {
-            throw CatalogError.bundleResourceNotFound
-        }
-        try FileManager.default.copyItem(at: bundleURL, to: url)
-    }
-}
-
-enum CatalogError: Error {
-    case bundleResourceNotFound
 }

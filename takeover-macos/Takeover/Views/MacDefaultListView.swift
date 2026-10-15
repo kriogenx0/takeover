@@ -149,7 +149,18 @@ struct MacDefaultListView: View {
     private func saveToYAML() async {
         let configs = macDefaults
             .filter { !$0.value.isEmpty }
-            .map { MacDefaultConfig(name: $0.name, value: $0.value, capturedOSMajorVersion: $0.capturedOSMajorVersion == 0 ? nil : $0.capturedOSMajorVersion) }
+            .map {
+                MacDefaultConfig(
+                    name: $0.name,
+                    domain: $0.domain,
+                    key: $0.key,
+                    type: $0.type,
+                    value: $0.value,
+                    hostFlag: $0.hostFlag.isEmpty ? nil : $0.hostFlag,
+                    postCommand: $0.postCommand.isEmpty ? nil : $0.postCommand,
+                    capturedOSMajorVersion: $0.capturedOSMajorVersion == 0 ? nil : $0.capturedOSMajorVersion
+                )
+            }
         guard var settings = SettingsManager.shared.settings else { return }
         settings.macDefaults = configs
         try? await SettingsManager.shared.saveSettings(settings)

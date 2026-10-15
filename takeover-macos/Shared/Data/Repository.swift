@@ -72,13 +72,12 @@ class Repository {
     private(set) var isLoading = false
     private(set) var error: Error?
 
-    private let remoteURL = URL(string: "https://raw.githubusercontent.com/kriogenx0/takeover/main/api/repository.json")!
-    private let cacheURL: URL = {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return caches.appendingPathComponent("Repository.json")
-    }()
-    private let cacheDateKey = "RepositoryCacheDate"
-    private let cacheDuration: TimeInterval = 86400 // 1 day
+    /// App catalog published by takeover-api; the old JSON in this repo is kept
+    /// as a fallback until the API serves the file.
+    private let sources = [
+        RemoteCatalog.catalogURL("apps.yaml"),
+        URL(string: "https://raw.githubusercontent.com/kriogenx0/takeover/main/api/repository.json")!,
+    ]
 
     private init() {}
 
@@ -87,30 +86,10 @@ class Repository {
         error = nil
         defer { isLoading = false }
 
-        // Return cached data if it's fresh
-        if let cachedDate = UserDefaults.standard.object(forKey: cacheDateKey) as? Date,
-           Date().timeIntervalSince(cachedDate) < cacheDuration,
-           let data = try? Data(contentsOf: cacheURL),
-           let cached = try? JSONDecoder().decode(RepositoryResponse.self, from: data) {
-            response = cached
-            return
-        }
-
-        // Fetch from network
         do {
-            let (data, _) = try await URLSession.shared.data(from: remoteURL)
-            let decoded = try JSONDecoder().decode(RepositoryResponse.self, from: data)
-            try data.write(to: cacheURL)
-            UserDefaults.standard.set(Date(), forKey: cacheDateKey)
-            response = decoded
+            response = try await RemoteCatalog.load(RepositoryResponse.self, sources: sources, cacheName: "apps-catalog")
         } catch let fetchError {
-            // Fall back to stale cache if available
-            if let data = try? Data(contentsOf: cacheURL),
-               let cached = try? JSONDecoder().decode(RepositoryResponse.self, from: data) {
-                response = cached
-            } else {
-                error = fetchError
-            }
+            error = fetchError
         }
     }
 }

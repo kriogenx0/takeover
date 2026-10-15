@@ -271,8 +271,8 @@ struct LinkItemDetailView: View {
             return ""
         }
 
-        // Show relative path from backup location
-        return "~/Library/Application Support/Takeover/\(linkItem.to)"
+        // Show path inside the chosen settings folder
+        return "\(Config.backupPath)/\(linkItem.to)"
     }
 
     func selectFile() async throws -> String? {

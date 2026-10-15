@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct TakeoverApp: App {
     @StateObject private var settingsManager = SettingsManager.shared
+    @State private var needsStorageSetup = StorageLocation.load() == nil
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -32,12 +33,31 @@ struct TakeoverApp: App {
             ContentView()
                 .task {
                     await checkPermissionsOnStartup()
-                    await ensureICloudDirectoryExists()
-                    await loadSettingsAndPopulate()
                     await Repository.shared.load()
+                    if !needsStorageSetup {
+                        await loadFromStorage()
+                    }
+                }
+                .sheet(isPresented: $needsStorageSetup) {
+                    StorageSetupView(isFirstLaunch: true) {
+                        needsStorageSetup = false
+                    }
+                    .interactiveDismissDisabled()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .storageLocationChanged)) { _ in
+                    Task { await loadFromStorage() }
                 }
         }
         .modelContainer(sharedModelContainer)
+
+        Settings {
+            StorageSetupView(isFirstLaunch: false)
+        }
+    }
+
+    private func loadFromStorage() async {
+        await ensureStorageDirectoryExists()
+        await loadSettingsAndPopulate()
     }
 
     @MainActor
@@ -50,10 +70,10 @@ struct TakeoverApp: App {
         }
     }
 
-    private func ensureICloudDirectoryExists() async {
+    private func ensureStorageDirectoryExists() async {
         let iCloudPath = Config.expandedBackupPath
 
-        print("DEBUG: Checking iCloud directory at: \(iCloudPath)")
+        print("DEBUG: Checking storage directory at: \(iCloudPath)")
 
         // Use shell command to check if directory exists
         let escapedPath = iCloudPath.replacingOccurrences(of: "'", with: "'\\''")
@@ -68,19 +88,23 @@ struct TakeoverApp: App {
             let createResult = Linker.shell("osascript -e '\(createDirScript)'")
 
             if createResult.isEmpty {
-                print("Created iCloud Takeover directory at: \(iCloudPath)")
+                print("Created Takeover storage directory at: \(iCloudPath)")
             } else {
                 print("DEBUG: osascript result: \(createResult)")
             }
         } else {
-            print("DEBUG: iCloud directory already exists at: \(iCloudPath)")
+            print("DEBUG: Storage directory already exists at: \(iCloudPath)")
         }
     }
 
     private func loadSettingsAndPopulate() async {
         do {
             let settings = try await settingsManager.loadSettings()
-            try await MacDefaultCatalog.shared.loadOrCreate()
+            do {
+                try await MacDefaultCatalog.shared.load()
+            } catch {
+                print("Error loading macOS defaults catalog: \(error)")
+            }
             await syncSettingsToDatabase(settings: settings)
         } catch {
             print("Error loading settings: \(error)")
@@ -113,33 +137,38 @@ struct TakeoverApp: App {
         let existingDefaults = (try? context.fetch(defaultsDescriptor)) ?? []
         let existingDefaultNames = Set(existingDefaults.map { $0.name })
 
-        let userValues: [String: String] = Dictionary(
-            uniqueKeysWithValues: (settings.macDefaults ?? []).compactMap { config in
-                guard let v = config.value, !v.isEmpty else { return nil }
-                return (config.name, v)
-            }
-        )
+        // Catalog entries for this macOS first, then any custom defaults the
+        // user's file describes that the catalog doesn't (or no longer) list.
+        let userConfigs = settings.macDefaults ?? []
+        let userByName = Dictionary(userConfigs.map { ($0.name, $0) }, uniquingKeysWith: { _, last in last })
+        let catalogNames = Set(MacDefaultCatalog.shared.entries.map { $0.name })
 
-        let userOSVersions: [String: Int] = Dictionary(
-            uniqueKeysWithValues: (settings.macDefaults ?? []).compactMap { config in
-                guard let v = config.capturedOSMajorVersion else { return nil }
-                return (config.name, v)
-            }
-        )
+        for entry in MacDefaultCatalog.shared.entries where !existingDefaultNames.contains(entry.name) {
+            let user = userByName[entry.name]
+            context.insert(MacDefault(
+                name: entry.name,
+                domain: entry.domain,
+                key: entry.key,
+                type: entry.type,
+                value: user?.value ?? "",
+                hostFlag: entry.hostFlag ?? "",
+                postCommand: entry.postCommand ?? "",
+                capturedOSMajorVersion: user?.capturedOSMajorVersion ?? 0
+            ))
+        }
 
-        for entry in MacDefaultCatalog.shared.entries {
-            if !existingDefaultNames.contains(entry.name) {
-                context.insert(MacDefault(
-                    name: entry.name,
-                    domain: entry.domain,
-                    key: entry.key,
-                    type: entry.type,
-                    value: userValues[entry.name] ?? "",
-                    hostFlag: entry.hostFlag ?? "",
-                    postCommand: entry.postCommand ?? "",
-                    capturedOSMajorVersion: userOSVersions[entry.name] ?? 0
-                ))
-            }
+        for config in userConfigs where !catalogNames.contains(config.name) && !existingDefaultNames.contains(config.name) {
+            guard let domain = config.domain, let key = config.key else { continue }
+            context.insert(MacDefault(
+                name: config.name,
+                domain: domain,
+                key: key,
+                type: config.type ?? "string",
+                value: config.value ?? "",
+                hostFlag: config.hostFlag ?? "",
+                postCommand: config.postCommand ?? "",
+                capturedOSMajorVersion: config.capturedOSMajorVersion ?? 0
+            ))
         }
 
         // Sync AppInstallers
